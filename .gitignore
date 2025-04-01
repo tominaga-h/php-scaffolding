@@ -1,0 +1,11 @@
+var/log/
+!var/log/.gitkeep
+var/coverage/*
+!var/coverage/.gitkeep
+coverage.xml
+vendor/
+.vscode/
+.DS_Store
+.env
+.phpunit.result.cache
+.php-cs-fixer.cache

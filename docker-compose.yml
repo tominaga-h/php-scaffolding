@@ -1,0 +1,8 @@
+services:
+  php:
+    build: .
+    volumes:
+      - .:/app
+      - ./php.ini:/usr/local/etc/php/php.ini
+    tty: true
+    stdin_open: true
