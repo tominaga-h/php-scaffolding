@@ -88,8 +88,25 @@ class Config
 		}
 	}
 
+	/**
+	 * テンプレートディレクトリ内のテンプレートを取得する
+	 *
+	 * @return Template[]
+	 */
 	public function getTemplates(): array
 	{
-		return [];
+		$templateDir = $this->joinPath($this->configDir, 'templates');
+		$items = scandir($templateDir) ?: [];
+		$templates = [];
+
+		foreach ($items as $name) {
+			if ($name === '.' || $name === '..') {
+				continue;
+			}
+
+			$templatePath = $this->joinPath($templateDir, $name);
+			$templates[] = new Template($templatePath);
+		}
+		return $templates;
 	}
 }
