@@ -14,6 +14,12 @@ class PathResolverTest extends TestCase
 		$this->path = new PathResolver('path/to/config');
 	}
 
+	public function testFrom()
+	{
+		$path = PathResolver::from('path/to/config', 'phpscff');
+		$this->assertEquals('path/to/config/phpscff', $path->getConfigDir());
+	}
+
 	public function testConfigDir()
 	{
 		$this->assertEquals('path/to/config', $this->path->getConfigDir());

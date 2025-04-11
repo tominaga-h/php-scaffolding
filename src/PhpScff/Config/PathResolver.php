@@ -13,6 +13,11 @@ class PathResolver
 		$this->configDir = $configDir;
 	}
 
+	public static function from(string $dir, string $name): self
+	{
+		return new self(Path::join($dir, $name));
+	}
+
 	public function getConfigDir(): string
 	{
 		return $this->configDir;
