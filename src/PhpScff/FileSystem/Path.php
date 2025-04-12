@@ -14,6 +14,18 @@ class Path
 	}
 
 	/**
+	 * 複数のパスからPathオブジェクトを生成する
+	 *
+	 * @param string ...$paths
+	 * @return Path
+	 */
+	public static function from(string ...$paths): self
+	{
+		$path = SymfonyPath::join(...$paths);
+		return new self($path);
+	}
+
+	/**
 	 * パスを取得する
 	 *
 	 * @return string
@@ -33,5 +45,10 @@ class Path
 	{
 		$path = SymfonyPath::join($this->path, ...$paths);
 		return new self($path);
+	}
+
+	public function basename(): string
+	{
+		return \basename($this->path);
 	}
 }

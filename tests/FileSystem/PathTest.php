@@ -34,4 +34,11 @@ class PathTest extends TestCase
 		$expected = '/test/dir/file.txt';
 		$this->assertEquals($expected, $actual);
 	}
+
+	public function testBasename()
+	{
+		$actual = $this->path->join('dir', 'file.txt')->basename();
+		$expected = 'file.txt';
+		$this->assertEquals($expected, $actual);
+	}
 }

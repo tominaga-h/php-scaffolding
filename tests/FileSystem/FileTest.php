@@ -1,0 +1,52 @@
+<?php
+
+namespace Tests\Config;
+
+use PHPUnit\Framework\TestCase;
+use org\bovigo\vfs\vfsStream;
+use org\bovigo\vfs\vfsStreamDirectory;
+use Symfony\Component\Filesystem\Filesystem;
+use Hytmng\PhpScff\FileSystem\Path;
+use Hytmng\PhpScff\FileSystem\File;
+
+class FileTest extends TestCase
+{
+	private File $file;
+	private Path $path;
+	private vfsStreamDirectory $root;
+
+	public function setUp(): void
+	{
+		// テスト環境構築
+		$this->root = vfsStream::setup('test');
+
+		// ファイルオブジェクト作成
+		$this->path = Path::from($this->root->url(), 'file.txt');
+		$this->file = new File($this->path, new Filesystem());
+	}
+
+	public function tearDown(): void
+	{
+		// テスト環境の削除
+		$this->root->removeChild($this->path->basename());
+	}
+
+	public function testGetFilePath()
+	{
+		$actual = $this->file->getFilePath();
+		$expected = $this->root->url() . '/file.txt';
+		$this->assertEquals($expected, $actual);
+	}
+
+	public function testExists()
+	{
+		$this->assertFalse($this->file->exists());
+
+		// テスト用のファイルを作成
+		$testFile = vfsStream::newFile('file.txt');
+		$testFile->withContent('test content');
+		$this->root->addChild($testFile);
+
+		$this->assertTrue($this->file->exists());
+	}
+}
