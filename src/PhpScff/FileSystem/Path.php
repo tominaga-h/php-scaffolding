@@ -24,13 +24,14 @@ class Path
 	}
 
 	/**
-	 * パスを結合する
+	 * パスを結合し、新しいPathオブジェクトを返す
 	 *
 	 * @param string ...$paths
-	 * @return string
+	 * @return self
 	 */
-	public function join(string ...$paths): string
+	public function join(string ...$paths): self
 	{
-		return SymfonyPath::join($this->path, ...$paths);
+		$path = SymfonyPath::join($this->path, ...$paths);
+		return new self($path);
 	}
 }

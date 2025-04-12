@@ -15,7 +15,8 @@ class PathResolver
 
 	public static function from(string $dir, string $name): self
 	{
-		return new self($dir . DIRECTORY_SEPARATOR . $name);
+		$path = new Path($dir);
+		return new self($path->join($name)->get());
 	}
 
 	public function getConfigDir(): string
@@ -25,12 +26,12 @@ class PathResolver
 
 	public function getTemplateDir(): string
 	{
-		return $this->configDir->join('templates');
+		return $this->configDir->join('templates')->get();
 	}
 
 	public function getGroupDir(): string
 	{
-		return $this->configDir->join('groups');
+		return $this->configDir->join('groups')->get();
 	}
 
 	public function getDirsInConfigDir(): array

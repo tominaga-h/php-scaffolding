@@ -23,14 +23,14 @@ class PathTest extends TestCase
 
 	public function testJoin()
 	{
-		$actual = $this->path->join('dir', 'file.txt');
+		$actual = $this->path->join('dir', 'file.txt')->get();
 		$expected = '/test/dir/file.txt';
 		$this->assertEquals($expected, $actual);
 	}
 
 	public function testJoin_sepalator()
 	{
-		$actual = $this->path->join('/dir/', '/file.txt');
+		$actual = $this->path->join('/dir/', '/file.txt')->get();
 		$expected = '/test/dir/file.txt';
 		$this->assertEquals($expected, $actual);
 	}
