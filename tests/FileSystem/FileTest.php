@@ -31,6 +31,14 @@ class FileTest extends TestCase
 		$this->root->removeChild($this->path->basename());
 	}
 
+	public function testFromPath()
+	{
+		$expected = '/test/path/file.txt';
+		$file = File::fromPath($expected);
+		$actual = $file->getFilePath();
+		$this->assertEquals($expected, $actual);
+	}
+
 	public function testGetFilePath()
 	{
 		$actual = $this->file->getFilePath();
