@@ -2,35 +2,35 @@
 
 namespace Hytmng\PhpScff\Config;
 
-use Symfony\Component\Filesystem\Path;
+use Hytmng\PhpScff\FileSystem\Path;
 
 class PathResolver
 {
-	private string $configDir;
+	private Path $configDir;
 
 	public function __construct(string $configDir)
 	{
-		$this->configDir = $configDir;
+		$this->configDir = new Path($configDir);
 	}
 
 	public static function from(string $dir, string $name): self
 	{
-		return new self(Path::join($dir, $name));
+		return new self($dir . DIRECTORY_SEPARATOR . $name);
 	}
 
 	public function getConfigDir(): string
 	{
-		return $this->configDir;
+		return $this->configDir->get();
 	}
 
 	public function getTemplateDir(): string
 	{
-		return Path::join($this->configDir, 'templates');
+		return $this->configDir->join('templates');
 	}
 
 	public function getGroupDir(): string
 	{
-		return Path::join($this->configDir, 'groups');
+		return $this->configDir->join('groups');
 	}
 
 	public function getDirsInConfigDir(): array
