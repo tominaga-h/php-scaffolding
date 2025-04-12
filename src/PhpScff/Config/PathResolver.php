@@ -15,7 +15,7 @@ class PathResolver
 
 	public static function from(string $dir, string $name): self
 	{
-		return new self(new Path($dir)->join($name));
+		return new self($dir . DIRECTORY_SEPARATOR . $name);
 	}
 
 	public function getConfigDir(): string
