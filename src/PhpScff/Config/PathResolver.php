@@ -15,8 +15,7 @@ class PathResolver
 
 	public static function from(string $dir, string $name): self
 	{
-		$path = new Path($dir);
-		return new self($path->join($name)->get());
+		return new self(Path::from($dir, $name)->get());
 	}
 
 	public function getConfigDir(): string
