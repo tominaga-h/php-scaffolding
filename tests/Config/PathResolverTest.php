@@ -42,4 +42,11 @@ class PathResolverTest extends TestCase
 			'path/to/config/groups',
 		], $this->path->getDirsInConfigDir());
 	}
+
+	public function testGetPath()
+	{
+		$actual = $this->path->getPath()->get();
+		$expected = 'path/to/config';
+		$this->assertEquals($expected, $actual);
+	}
 }
