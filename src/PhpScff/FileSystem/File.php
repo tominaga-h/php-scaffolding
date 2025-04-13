@@ -6,6 +6,7 @@ use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
 use Hytmng\PhpScff\FileSystem\AbstractFileSystem;
 use Hytmng\PhpScff\FileSystem\Path;
+
 class File extends AbstractFileSystem
 {
 	/**
