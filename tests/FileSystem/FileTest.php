@@ -47,6 +47,13 @@ class FileTest extends TestCase
 		$this->assertEquals($expected, $actual);
 	}
 
+	public function testGetFilename()
+	{
+		$actual = $this->file->getFilename();
+		$expected = 'file.txt';
+		$this->assertEquals($expected, $actual);
+	}
+
 	public function testExists()
 	{
 		$this->assertFalse($this->file->exists());

@@ -110,4 +110,33 @@ class DirectoryTest extends TestCase
 		$this->assertTrue($list[1]->isFile());
 		$this->assertEquals($list[1]->getPath(), $this->root->url() . '/subdir1/file3.txt');
 	}
+
+	public function testList_throwException()
+	{
+		$path = Path::from($this->root->url(), 'notfound');
+		$this->directory = Directory::fromPath($path->get());
+		$this->expectException(IOException::class);
+		$this->expectExceptionMessage('Directory "' . $path->get() . '" is not exists');
+		$this->directory->list();
+	}
+
+	public function testGetIterator()
+	{
+		vfsStream::newFile('file1.txt')->at($this->root);
+		$subdir1 = vfsStream::newDirectory('subdir1')->at($this->root);
+		vfsStream::newFile('file3.txt')->at($subdir1);
+
+		$iter = $this->directory->getIterator();
+		$count = 0;
+		foreach ($iter as $item) {
+			if ($count === 0) {
+				$this->assertTrue($item->isFile());
+				$this->assertEquals($item->getPath(), $this->root->url() . '/file1.txt');
+			} else {
+				$this->assertTrue($item->isDir());
+				$this->assertEquals($item->getPath(), $this->root->url() . '/subdir1');
+			}
+			$count++;
+		}
+	}
 }
