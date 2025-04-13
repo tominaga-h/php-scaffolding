@@ -30,6 +30,16 @@ class Template
 	}
 
 	/**
+	 * テンプレートのパスを取得する
+	 *
+	 * @return string
+	 */
+	public function getPath(): string
+	{
+		return $this->file->getPath();
+	}
+
+	/**
 	 * ファイル名を取得する
 	 *
 	 * @return string
@@ -46,6 +56,7 @@ class Template
 	 */
 	public function copy(string $dest): void
 	{
-		$this->filesystem->copy($this->file->getPath(), $dest);
+		$destPath = Path::from($dest, $this->getFilename());
+		$this->filesystem->copy($this->file->getPath(), $destPath->get());
 	}
 }

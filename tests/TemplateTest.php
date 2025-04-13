@@ -3,8 +3,6 @@
 namespace Tests\PhpScff;
 
 use PHPUnit\Framework\TestCase;
-use org\bovigo\vfs\vfsStream;
-use org\bovigo\vfs\vfsStreamDirectory;
 use Hytmng\PhpScff\FileSystem\Path;
 use Hytmng\PhpScff\FileSystem\File;
 use Hytmng\PhpScff\Template;
@@ -12,22 +10,38 @@ use Symfony\Component\Filesystem\Filesystem;
 
 class TemplateTest extends TestCase
 {
+	private string $testDir;
 	private File $file;
 	private Path $path;
 	private Template $template;
-	private vfsStreamDirectory $root;
+	private Filesystem $filesystem;
 
 	public function setUp(): void
 	{
-		// テスト環境構築
-		$this->root = vfsStream::setup('test');
+		$this->filesystem = new Filesystem();
+		$this->testDir = sys_get_temp_dir() . '/phpscff_test_' . uniqid();
+		$this->filesystem->mkdir($this->testDir);
 
 		// ファイルオブジェクト作成
-		$this->path = Path::from($this->root->url(), 'template.txt');
-		$this->file = new File($this->path, new Filesystem());
+		$this->path = Path::from($this->testDir, 'template.txt');
+		$this->file = new File($this->path, $this->filesystem);
 
 		// Templateオブジェクト作成
-		$this->template = new Template($this->file, new Filesystem());
+		$this->template = new Template($this->file, $this->filesystem);
+	}
+
+	public function tearDown(): void
+	{
+		if ($this->filesystem->exists($this->testDir)) {
+			$this->filesystem->remove($this->testDir);
+		}
+	}
+
+	public function testGetPath()
+	{
+		$actual = $this->template->getPath();
+		$expected = $this->path->get();
+		$this->assertEquals($expected, $actual);
 	}
 
 	public function testGetFilename()
@@ -48,21 +62,18 @@ class TemplateTest extends TestCase
 	public function testCopy()
 	{
 		// テスト用のファイルを作成
-		$testFile = vfsStream::newFile('template.txt');
-		$testFile->withContent('test content');
-		$this->root->addChild($testFile);
+		$this->file->write('test content');
 
 		// コピー先のディレクトリを作成
-		$copyDir = vfsStream::newDirectory('copy');
-		$this->root->addChild($copyDir);
+		$copyDir = $this->testDir . '/copy';
+		$this->filesystem->mkdir($copyDir);
 
 		// コピー実行
-		$dest = Path::from($this->root->url(), 'copy', 'template.txt');
-		$this->template->copy($dest->get());
+		$this->template->copy($copyDir);
 
 		// コピー結果の検証
-		$this->assertDirectoryExists($this->root->url() . '/copy');
-		$this->assertFileExists($this->root->url() . '/copy/template.txt');
-		$this->assertEquals('test content', file_get_contents($this->root->url() . '/copy/template.txt'));
+		$expectedPath = $copyDir . '/template.txt';
+		$this->assertTrue($this->filesystem->exists($expectedPath));
+		$this->assertEquals('test content', file_get_contents($expectedPath));
 	}
 }

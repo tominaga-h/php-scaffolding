@@ -25,7 +25,6 @@ class ConfigStorage
 	public function __construct(string $path, string $name = '.phpscff')
 	{
 		$this->resolver = PathResolver::from($path, $name);
-		// $this->directory = Directory::fromPath($this->resolver->getConfigDir());
 		$this->path = $this->resolver->getPath();
 		$this->templates = [];
 	}
@@ -110,8 +109,9 @@ class ConfigStorage
 	public function addTemplate(Template $template): void
 	{
 		$this->templates[] = $template;
-		if ($this->getTemplateDir()->exists()) {
-			$template->copy($this->getTemplateDir()->getPath());
+		$templateDir = $this->getTemplateDir();
+		if ($templateDir->exists()) {
+			$template->copy($templateDir->getPath());
 		}
 	}
 
