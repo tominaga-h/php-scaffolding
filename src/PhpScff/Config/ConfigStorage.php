@@ -11,10 +11,7 @@ use Symfony\Component\Filesystem\Exception\IOException;
 
 class ConfigStorage
 {
-
-	private Path $path;
 	private PathResolver $resolver;
-	private array $templates = [];
 
 	/**
 	 * コンストラクタ
@@ -25,8 +22,6 @@ class ConfigStorage
 	public function __construct(string $path, string $name = '.phpscff')
 	{
 		$this->resolver = PathResolver::from($path, $name);
-		$this->path = $this->resolver->getPath();
-		$this->templates = [];
 	}
 
 	/**
@@ -94,11 +89,8 @@ class ConfigStorage
 		$this->getConfigDir()->create();
 
 		// 下層フォルダの作成
-		$paths = $this->resolver->getDirsInConfigDir();
-		foreach ($paths as $path) {
-			$dir = Directory::fromPath($path);
-			$dir->create();
-		}
+		$this->getTemplateDir()->create();
+		$this->getGroupDir()->create();
 	}
 
 	/**
@@ -108,7 +100,6 @@ class ConfigStorage
 	 */
 	public function addTemplate(Template $template): void
 	{
-		$this->templates[] = $template;
 		$templateDir = $this->getTemplateDir();
 		if ($templateDir->exists()) {
 			$template->copy($templateDir->getPath());
@@ -123,10 +114,9 @@ class ConfigStorage
 	public function getTemplates(): array
 	{
 		$files = $this->getTemplateDir()->list(true);
-		$this->templates = \array_map(function (File|Directory $item) {
+		return \array_map(function (File|Directory $item) {
 			return Template::fromPath($item->getPath());
 		}, $files);
-		return $this->templates;
 	}
 
 }
