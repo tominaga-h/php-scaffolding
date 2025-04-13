@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Config;
+namespace Tests\FileSystem;
 
 use PHPUnit\Framework\TestCase;
 use Hytmng\PhpScff\FileSystem\Path;

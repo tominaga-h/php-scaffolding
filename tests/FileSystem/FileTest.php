@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Config;
+namespace Tests\FileSystem;
 
 use PHPUnit\Framework\TestCase;
 use org\bovigo\vfs\vfsStream;
@@ -36,13 +36,13 @@ class FileTest extends TestCase
 	{
 		$expected = '/test/path/file.txt';
 		$file = File::fromPath($expected);
-		$actual = $file->getFilePath();
+		$actual = $file->getPath();
 		$this->assertEquals($expected, $actual);
 	}
 
 	public function testGetFilePath()
 	{
-		$actual = $this->file->getFilePath();
+		$actual = $this->file->getPath();
 		$expected = $this->root->url() . '/file.txt';
 		$this->assertEquals($expected, $actual);
 	}
