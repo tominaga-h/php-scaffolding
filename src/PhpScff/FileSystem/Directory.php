@@ -41,7 +41,7 @@ class Directory extends AbstractFileSystem implements IteratorAggregate
 	 * ディレクトリの内容をオブジェクトにした配列を返す
 	 *
 	 * @param bool $recursive trueにすると再帰的にディレクトリの内容を取得する
-	 * @return array<File|Directory>
+	 * @return File[]|Directory[]
 	 */
 	public function list(bool $recursive = false): array
 	{

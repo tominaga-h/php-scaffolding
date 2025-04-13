@@ -21,6 +21,16 @@ class File extends AbstractFileSystem
 	}
 
 	/**
+	 * ファイル名を取得する
+	 *
+	 * @return string
+	 */
+	public function getFilename(): string
+	{
+		return $this->path->basename();
+	}
+
+	/**
 	 * ファイルの内容を読み込む
 	 *
 	 * @return string

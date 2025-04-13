@@ -18,6 +18,11 @@ class PathResolver
 		return new self(Path::from($dir, $name)->get());
 	}
 
+	public function getPath(): Path
+	{
+		return $this->configDir;
+	}
+
 	public function getConfigDir(): string
 	{
 		return $this->configDir->get();
