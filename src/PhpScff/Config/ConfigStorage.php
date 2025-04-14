@@ -94,6 +94,25 @@ class ConfigStorage
 	}
 
 	/**
+	 * 設定フォルダを削除する
+	 *
+	 * @throws IOException
+	 */
+	public function remove(): void
+	{
+		if (!$this->exists()) {
+			throw new IOException('Config directory is not exists');
+		}
+
+		// 下層フォルダの削除
+		$this->getTemplateDir()->remove();
+		$this->getGroupDir()->remove();
+
+		// 設定フォルダの削除
+		$this->getConfigDir()->remove();
+	}
+
+	/**
 	 * テンプレートを追加する
 	 *
 	 * @param Template $template

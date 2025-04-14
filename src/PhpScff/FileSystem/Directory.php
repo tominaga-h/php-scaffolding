@@ -38,6 +38,20 @@ class Directory extends AbstractFileSystem implements IteratorAggregate
 	}
 
 	/**
+	 * ディレクトリを削除する
+	 *
+	 * @throws IOException
+	 */
+	public function remove(): void
+	{
+		if (!$this->exists()) {
+			throw new IOException('Directory "' . $this->path->get() . '" is not exists');
+		}
+
+		$this->fs->remove($this->path->get());
+	}
+
+	/**
 	 * ディレクトリの内容をオブジェクトにした配列を返す
 	 *
 	 * @param bool $recursive trueにすると再帰的にディレクトリの内容を取得する

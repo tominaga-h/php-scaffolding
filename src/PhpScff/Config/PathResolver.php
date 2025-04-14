@@ -38,11 +38,4 @@ class PathResolver
 		return $this->configDir->join('groups')->get();
 	}
 
-	public function getDirsInConfigDir(): array
-	{
-		return [
-			$this->getTemplateDir(),
-			$this->getGroupDir(),
-		];
-	}
 }

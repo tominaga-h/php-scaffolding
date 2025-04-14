@@ -86,6 +86,28 @@ class ConfigStorageTest extends TestCase
 		$this->assertTrue($groupDir->exists());
 	}
 
+	public function testRemove()
+	{
+		$this->configStorage->create();
+		$this->assertTrue($this->configStorage->exists());
+
+		$configDir = $this->configStorage->getConfigDir();
+		$this->assertTrue($configDir->exists());
+
+		$templateDir = $this->configStorage->getTemplateDir();
+		$this->assertTrue($templateDir->exists());
+
+		$groupDir = $this->configStorage->getGroupDir();
+		$this->assertTrue($groupDir->exists());
+
+		$this->configStorage->remove();
+		$this->assertFalse($this->configStorage->exists());
+
+		$this->assertFalse($configDir->exists());
+		$this->assertFalse($templateDir->exists());
+		$this->assertFalse($groupDir->exists());
+	}
+
 	public function testCreate_throwException()
 	{
 		$this->configStorage->create();

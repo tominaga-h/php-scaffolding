@@ -35,14 +35,6 @@ class PathResolverTest extends TestCase
 		$this->assertEquals('path/to/config/groups', $this->path->getGroupDir());
 	}
 
-	public function testDirsInConfigDir()
-	{
-		$this->assertSame([
-			'path/to/config/templates',
-			'path/to/config/groups',
-		], $this->path->getDirsInConfigDir());
-	}
-
 	public function testGetPath()
 	{
 		$actual = $this->path->getPath()->get();

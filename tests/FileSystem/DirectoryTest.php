@@ -77,6 +77,21 @@ class DirectoryTest extends TestCase
 		$this->directory->create();
 	}
 
+	public function testRemove()
+	{
+		$path = Path::from($this->root->url(), 'testdir');
+		$this->directory = Directory::fromPath($path->get());
+		vfsStream::newDirectory('testdir')->at($this->root);
+		$this->assertTrue($this->directory->exists());
+
+		$this->directory->remove();
+		$this->assertFalse($this->directory->exists());
+
+		$this->expectException(IOException::class);
+		$this->expectExceptionMessage('Directory "' . $path->get() . '" is not exists');
+		$this->directory->remove();
+	}
+
 	public function testList()
 	{
 		vfsStream::newFile('file1.txt')->at($this->root);
