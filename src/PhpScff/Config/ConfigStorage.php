@@ -138,4 +138,17 @@ class ConfigStorage
 		}, $files);
 	}
 
+	/**
+	 * テンプレートが存在するかどうかを確認する
+	 *
+	 * @param string $filename
+	 * @return bool
+	 */
+	public function hasTemplate(string $filename): bool
+	{
+		$templates = $this->getTemplates();
+		$filtered = \array_filter($templates, fn (Template $template) => $template->getFilename() === $filename);
+		return \count($filtered) > 0;
+	}
+
 }

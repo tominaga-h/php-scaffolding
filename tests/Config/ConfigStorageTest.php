@@ -175,4 +175,18 @@ class ConfigStorageTest extends TestCase
 		$this->assertInstanceOf(Template::class, $templates[0]);
 		$this->assertEquals('template.txt', $templates[0]->getFilename());
 	}
+
+	public function testHasTemplate()
+	{
+		$this->configStorage->create();
+
+		// テンプレートファイルを作成
+		$templatePath = Path::from($this->testDir, '/templates/template.txt');
+		$file = File::fromPath($templatePath->get());
+		$file->write('test content');
+
+		// テンプレートの存在確認
+		$this->assertTrue($this->configStorage->hasTemplate('template.txt'));
+		$this->assertFalse($this->configStorage->hasTemplate('not_exists.txt'));
+	}
 }
