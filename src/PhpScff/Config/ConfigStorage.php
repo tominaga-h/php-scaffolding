@@ -4,9 +4,9 @@ namespace Hytmng\PhpScff\Config;
 
 use Hytmng\PhpScff\Template;
 use Hytmng\PhpScff\Config\PathResolver;
-use Hytmng\PhpScff\FileSystem\Path;
 use Hytmng\PhpScff\FileSystem\File;
 use Hytmng\PhpScff\FileSystem\Directory;
+use Hytmng\PhpScff\FileSystem\FileSystemInterface;
 use Symfony\Component\Filesystem\Exception\IOException;
 
 class ConfigStorage
@@ -133,7 +133,7 @@ class ConfigStorage
 	public function getTemplates(): array
 	{
 		$files = $this->getTemplateDir()->list(true);
-		return \array_map(function (File|Directory $item) {
+		return \array_map(function (FileSystemInterface $item) {
 			if ($item instanceof File) {
 				return Template::fromFile($item);
 			}

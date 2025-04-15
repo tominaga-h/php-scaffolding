@@ -11,6 +11,7 @@ use Symfony\Component\Filesystem\Exception\IOException;
 use Hytmng\PhpScff\FileSystem\AbstractFileSystem;
 use Hytmng\PhpScff\FileSystem\Path;
 use Hytmng\PhpScff\FileSystem\Helper;
+use Hytmng\PhpScff\FileSystem\FileSystemInterface;
 
 class Directory extends AbstractFileSystem implements IteratorAggregate
 {
@@ -65,7 +66,7 @@ class Directory extends AbstractFileSystem implements IteratorAggregate
 	 * ディレクトリの内容をオブジェクトにした配列を返す
 	 *
 	 * @param bool $recursive trueにすると再帰的にディレクトリの内容を取得する
-	 * @return File[]|Directory[]
+	 * @return FileSystemInterface[]
 	 */
 	public function list(bool $recursive = false): array
 	{
