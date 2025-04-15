@@ -149,11 +149,17 @@ class ConfigStorage
 	/**
 	 * テンプレートが存在するかどうかを確認する
 	 *
-	 * @param string $filename
+	 * @param string|Template $template
 	 * @return bool
 	 */
-	public function hasTemplate(string $filename): bool
+	public function hasTemplate(string|Template $template): bool
 	{
+		if ($template instanceof Template) {
+			$filename = $template->getFilename();
+		} else {
+			$filename = $template;
+		}
+
 		$templates = $this->getTemplates();
 		$filtered = \array_filter($templates, function (Template $template) use ($filename) {
 			return $template->getFilename() === $filename;

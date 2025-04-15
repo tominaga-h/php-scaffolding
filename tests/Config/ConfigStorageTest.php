@@ -189,4 +189,16 @@ class ConfigStorageTest extends TestCase
 		$this->assertTrue($this->configStorage->hasTemplate('template.txt'));
 		$this->assertFalse($this->configStorage->hasTemplate('not_exists.txt'));
 	}
+
+	public function testHasTemplate_Template()
+	{
+		$this->configStorage->create();
+
+		$templatePath = Path::from($this->testDir, '/templates/template.txt');
+		$file = File::fromPath($templatePath);
+		$file->write('test content');
+		$template = Template::fromFile($file);
+
+		$this->assertTrue($this->configStorage->hasTemplate($template));
+	}
 }
