@@ -6,7 +6,7 @@ use PHPUnit\Framework\TestCase;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamDirectory;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Filesystem\Exception\IOException;
+use Hytmng\PhpScff\Exception\ExistenceException;
 use Hytmng\PhpScff\FileSystem\Path;
 use Hytmng\PhpScff\FileSystem\Directory;
 
@@ -72,7 +72,7 @@ class DirectoryTest extends TestCase
 		$this->directory->create();
 		$this->assertTrue($this->directory->exists());
 
-		$this->expectException(IOException::class);
+		$this->expectException(ExistenceException::class);
 		$this->expectExceptionMessage('Directory "' . $path->get() . '" is already exists');
 		$this->directory->create();
 	}
@@ -87,7 +87,7 @@ class DirectoryTest extends TestCase
 		$this->directory->remove();
 		$this->assertFalse($this->directory->exists());
 
-		$this->expectException(IOException::class);
+		$this->expectException(ExistenceException::class);
 		$this->expectExceptionMessage('Directory "' . $path->get() . '" is not exists');
 		$this->directory->remove();
 	}
@@ -130,7 +130,7 @@ class DirectoryTest extends TestCase
 	{
 		$path = Path::from($this->root->url(), 'notfound');
 		$this->directory = Directory::fromPath($path);
-		$this->expectException(IOException::class);
+		$this->expectException(ExistenceException::class);
 		$this->expectExceptionMessage('Directory "' . $path->get() . '" is not exists');
 		$this->directory->list();
 	}

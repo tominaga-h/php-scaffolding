@@ -7,7 +7,7 @@ use Hytmng\PhpScff\Config\PathResolver;
 use Hytmng\PhpScff\FileSystem\File;
 use Hytmng\PhpScff\FileSystem\Directory;
 use Hytmng\PhpScff\FileSystem\FileSystemInterface;
-use Symfony\Component\Filesystem\Exception\IOException;
+use Hytmng\PhpScff\Exception\ExistenceException;
 
 class ConfigStorage
 {
@@ -77,12 +77,12 @@ class ConfigStorage
 	/**
 	 * 設定フォルダを作成する
 	 *
-	 * @throws IOException
+	 * @throws ExistenceException
 	 */
 	public function create(): void
 	{
 		if ($this->exists()) {
-			throw new IOException('Config directory is already exists');
+			throw new ExistenceException('Config directory is already exists');
 		}
 
 		// 設定フォルダの作成
@@ -96,12 +96,12 @@ class ConfigStorage
 	/**
 	 * 設定フォルダを削除する
 	 *
-	 * @throws IOException
+	 * @throws ExistenceException
 	 */
 	public function remove(): void
 	{
 		if (!$this->exists()) {
-			throw new IOException('Config directory is not exists');
+			throw new ExistenceException('Config directory is not exists');
 		}
 
 		// 下層フォルダの削除
@@ -116,9 +116,14 @@ class ConfigStorage
 	 * テンプレートを追加する
 	 *
 	 * @param Template $template
+	 * @throws ExistenceException
 	 */
 	public function addTemplate(Template $template): void
 	{
+		if ($this->hasTemplate($template->getFilename())) {
+			throw new ExistenceException('Template is already exists');
+		}
+
 		$templateDir = $this->getTemplateDir();
 		if ($templateDir->exists()) {
 			$template->copy($templateDir->getStringPath());
@@ -150,7 +155,9 @@ class ConfigStorage
 	public function hasTemplate(string $filename): bool
 	{
 		$templates = $this->getTemplates();
-		$filtered = \array_filter($templates, fn (Template $template) => $template->getFilename() === $filename);
+		$filtered = \array_filter($templates, function (Template $template) use ($filename) {
+			return $template->getFilename() === $filename;
+		});
 		return \count($filtered) > 0;
 	}
 

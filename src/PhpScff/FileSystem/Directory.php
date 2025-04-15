@@ -7,11 +7,11 @@ use RecursiveIteratorIterator;
 use RecursiveDirectoryIterator;
 use FilesystemIterator;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Filesystem\Exception\IOException;
 use Hytmng\PhpScff\FileSystem\AbstractFileSystem;
 use Hytmng\PhpScff\FileSystem\Path;
 use Hytmng\PhpScff\FileSystem\Helper;
 use Hytmng\PhpScff\FileSystem\FileSystemInterface;
+use Hytmng\PhpScff\Exception\ExistenceException;
 
 class Directory extends AbstractFileSystem implements IteratorAggregate
 {
@@ -38,25 +38,27 @@ class Directory extends AbstractFileSystem implements IteratorAggregate
 
 	/**
 	 * ディレクトリを作成する
+	 *
+	 * @throws ExistenceException
 	 */
 	public function create(int $mode = 0777): void
 	{
 		if (!$this->exists()) {
 			$this->fs->mkdir($this->path->get(), $mode);
 		} else {
-			throw new IOException('Directory "' . $this->path->get() . '" is already exists');
+			throw new ExistenceException('Directory "' . $this->path->get() . '" is already exists');
 		}
 	}
 
 	/**
 	 * ディレクトリを削除する
 	 *
-	 * @throws IOException
+	 * @throws ExistenceException
 	 */
 	public function remove(): void
 	{
 		if (!$this->exists()) {
-			throw new IOException('Directory "' . $this->path->get() . '" is not exists');
+			throw new ExistenceException('Directory "' . $this->path->get() . '" is not exists');
 		}
 
 		$this->fs->remove($this->path->get());
@@ -67,11 +69,12 @@ class Directory extends AbstractFileSystem implements IteratorAggregate
 	 *
 	 * @param bool $recursive trueにすると再帰的にディレクトリの内容を取得する
 	 * @return FileSystemInterface[]
+	 * @throws ExistenceException
 	 */
 	public function list(bool $recursive = false): array
 	{
 		if (!$this->exists()) {
-			throw new IOException('Directory "' . $this->path->get() . '" is not exists');
+			throw new ExistenceException('Directory "' . $this->path->get() . '" is not exists');
 		}
 
 		if ($recursive) {

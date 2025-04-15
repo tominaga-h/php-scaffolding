@@ -6,9 +6,9 @@ use PHPUnit\Framework\TestCase;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamDirectory;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Filesystem\Exception\IOException;
 use Hytmng\PhpScff\FileSystem\Path;
 use Hytmng\PhpScff\FileSystem\File;
+use Hytmng\PhpScff\Exception\ExistenceException;
 
 class FileTest extends TestCase
 {
@@ -116,7 +116,7 @@ class FileTest extends TestCase
 		$this->file->write($expected);
 		$this->assertTrue($this->file->exists());
 
-		$this->expectException(IOException::class);
+		$this->expectException(ExistenceException::class);
 		$this->file->write($expected);
 	}
 }

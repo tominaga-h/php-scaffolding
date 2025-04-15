@@ -9,8 +9,8 @@ use Hytmng\PhpScff\FileSystem\File;
 use Hytmng\PhpScff\FileSystem\Directory;
 use Hytmng\PhpScff\FileSystem\Path;
 use Hytmng\PhpScff\Template;
+use Hytmng\PhpScff\Exception\ExistenceException;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Filesystem\Exception\IOException;
 
 class ConfigStorageTest extends TestCase
 {
@@ -111,7 +111,7 @@ class ConfigStorageTest extends TestCase
 	public function testCreate_throwException()
 	{
 		$this->configStorage->create();
-		$this->expectException(IOException::class);
+		$this->expectException(ExistenceException::class);
 		$this->expectExceptionMessage('Config directory is already exists');
 
 		$this->configStorage->create();
@@ -155,9 +155,9 @@ class ConfigStorageTest extends TestCase
 		$template = new Template($file, new Filesystem());
 
 		// テンプレートを追加
+		$this->expectException(ExistenceException::class);
 		$this->configStorage->addTemplate($template);
 
-		// テンプレートディレクトリが存在しないので、コピーは行われないはず
 		$templateDir = $this->configStorage->getTemplateDir();
 		$this->assertFalse($templateDir->exists());
 	}
