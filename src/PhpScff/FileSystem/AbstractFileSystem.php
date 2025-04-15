@@ -3,6 +3,7 @@
 namespace Hytmng\PhpScff\FileSystem;
 
 use Hytmng\PhpScff\FileSystem\Path;
+use Hytmng\PhpScff\FileSystem\PathTrait;
 use Hytmng\PhpScff\FileSystem\File;
 use Hytmng\PhpScff\FileSystem\Directory;
 use Hytmng\PhpScff\FileSystem\FileSystemInterface;
@@ -10,7 +11,8 @@ use Symfony\Component\Filesystem\Filesystem;
 
 abstract class AbstractFileSystem implements FileSystemInterface
 {
-	protected Path $path;
+	use PathTrait;
+
 	protected Filesystem $fs;
 
 	/**
@@ -23,16 +25,6 @@ abstract class AbstractFileSystem implements FileSystemInterface
 	{
 		$this->path = $path;
 		$this->fs = $fs;
-	}
-
-	/**
-	 * パスを取得する
-	 *
-	 * @return string
-	 */
-	public function getPath(): string
-	{
-		return $this->path->get();
 	}
 
 	/**

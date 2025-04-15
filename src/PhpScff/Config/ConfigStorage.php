@@ -41,7 +41,7 @@ class ConfigStorage
 	 */
 	public function getConfigDir(): Directory
 	{
-		return Directory::fromPath($this->resolver->getConfigDir());
+		return Directory::fromStringPath($this->resolver->getConfigDir());
 	}
 
 	/**
@@ -51,7 +51,7 @@ class ConfigStorage
 	 */
 	public function getTemplateDir(): Directory
 	{
-		return Directory::fromPath($this->resolver->getTemplateDir());
+		return Directory::fromStringPath($this->resolver->getTemplateDir());
 	}
 
 	/**
@@ -61,7 +61,7 @@ class ConfigStorage
 	 */
 	public function getGroupDir(): Directory
 	{
-		return Directory::fromPath($this->resolver->getGroupDir());
+		return Directory::fromStringPath($this->resolver->getGroupDir());
 	}
 
 	/**
@@ -121,7 +121,7 @@ class ConfigStorage
 	{
 		$templateDir = $this->getTemplateDir();
 		if ($templateDir->exists()) {
-			$template->copy($templateDir->getPath());
+			$template->copy($templateDir->getStringPath());
 		}
 	}
 
@@ -134,7 +134,10 @@ class ConfigStorage
 	{
 		$files = $this->getTemplateDir()->list(true);
 		return \array_map(function (File|Directory $item) {
-			return Template::fromPath($item->getPath());
+			if ($item instanceof File) {
+				return Template::fromFile($item);
+			}
+			return $item;
 		}, $files);
 	}
 

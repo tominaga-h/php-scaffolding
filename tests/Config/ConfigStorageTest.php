@@ -38,7 +38,7 @@ class ConfigStorageTest extends TestCase
 		$configDir = $this->configStorage->getConfigDir();
 		$this->assertInstanceOf(Directory::class, $configDir);
 
-		$actual = $configDir->getPath();
+		$actual = $configDir->getStringPath();
 		$expected = $this->testDir;
 		$this->assertEquals($expected, $actual);
 	}
@@ -48,7 +48,7 @@ class ConfigStorageTest extends TestCase
 		$templateDir = $this->configStorage->getTemplateDir();
 		$this->assertInstanceOf(Directory::class, $templateDir);
 
-		$actual = $templateDir->getPath();
+		$actual = $templateDir->getStringPath();
 		$expected = $this->testDir . '/templates';
 		$this->assertEquals($expected, $actual);
 	}
@@ -58,7 +58,7 @@ class ConfigStorageTest extends TestCase
 		$groupDir = $this->configStorage->getGroupDir();
 		$this->assertInstanceOf(Directory::class, $groupDir);
 
-		$actual = $groupDir->getPath();
+		$actual = $groupDir->getStringPath();
 		$expected = $this->testDir . '/groups';
 		$this->assertEquals($expected, $actual);
 	}
@@ -124,7 +124,7 @@ class ConfigStorageTest extends TestCase
 
 		// テンプレートファイルを作成
 		$templatePath = $this->testDir . '/template.txt';
-		$file = File::fromPath($templatePath);
+		$file = File::fromStringPath($templatePath);
 		$file->write('test content');
 
 		// テンプレートオブジェクトを作成
@@ -137,7 +137,7 @@ class ConfigStorageTest extends TestCase
 		$templateDir = $this->configStorage->getTemplateDir();
 		$this->assertTrue($templateDir->exists());
 
-		$expectedPath = $templateDir->getPath() . '/template.txt';
+		$expectedPath = $templateDir->getStringPath() . '/template.txt';
 		$this->assertTrue($this->filesystem->exists($expectedPath));
 
 		// コピーされたファイルの内容を確認
@@ -148,7 +148,7 @@ class ConfigStorageTest extends TestCase
 	{
 		// テンプレートファイルを作成
 		$templatePath = $this->testDir . '/template.txt';
-		$file = File::fromPath($templatePath);
+		$file = File::fromStringPath($templatePath);
 		$file->write('test content');
 
 		// テンプレートオブジェクトを作成
@@ -167,7 +167,7 @@ class ConfigStorageTest extends TestCase
 		$this->configStorage->create();
 
 		$templatePath = Path::from($this->testDir, '/templates/template.txt');
-		$file = File::fromPath($templatePath->get());
+		$file = File::fromPath($templatePath);
 		$file->write('test content');
 
 		$templates = $this->configStorage->getTemplates();
@@ -182,7 +182,7 @@ class ConfigStorageTest extends TestCase
 
 		// テンプレートファイルを作成
 		$templatePath = Path::from($this->testDir, '/templates/template.txt');
-		$file = File::fromPath($templatePath->get());
+		$file = File::fromPath($templatePath);
 		$file->write('test content');
 
 		// テンプレートの存在確認

@@ -35,14 +35,14 @@ class FileTest extends TestCase
 	public function testFromPath()
 	{
 		$expected = '/test/path/file.txt';
-		$file = File::fromPath($expected);
-		$actual = $file->getPath();
+		$file = File::fromStringPath($expected);
+		$actual = $file->getStringPath();
 		$this->assertEquals($expected, $actual);
 	}
 
 	public function testGetFilePath()
 	{
-		$actual = $this->file->getPath();
+		$actual = $this->file->getStringPath();
 		$expected = $this->root->url() . '/file.txt';
 		$this->assertEquals($expected, $actual);
 	}

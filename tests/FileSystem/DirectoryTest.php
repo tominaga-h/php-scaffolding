@@ -41,14 +41,14 @@ class DirectoryTest extends TestCase
 	public function testFromPath()
 	{
 		$expected = '/test/path/directory';
-		$directory = Directory::fromPath($expected);
-		$actual = $directory->getPath();
+		$directory = Directory::fromStringPath($expected);
+		$actual = $directory->getStringPath();
 		$this->assertEquals($expected, $actual);
 	}
 
 	public function testGetDirPath()
 	{
-		$actual = $this->directory->getPath();
+		$actual = $this->directory->getStringPath();
 		$expected = $this->root->url();
 		$this->assertEquals($expected, $actual);
 	}
@@ -56,7 +56,7 @@ class DirectoryTest extends TestCase
 	public function testExists()
 	{
 		$path = Path::from($this->root->url(), 'testdir');
-		$this->directory = Directory::fromPath($path->get());
+		$this->directory = Directory::fromPath($path);
 		$this->assertFalse($this->directory->exists());
 
 		vfsStream::newDirectory('testdir')->at($this->root);
@@ -66,7 +66,7 @@ class DirectoryTest extends TestCase
 	public function testCreate()
 	{
 		$path = Path::from($this->root->url(), 'testdir');
-		$this->directory = Directory::fromPath($path->get());
+		$this->directory = Directory::fromPath($path);
 		$this->assertFalse($this->directory->exists());
 
 		$this->directory->create();
@@ -80,7 +80,7 @@ class DirectoryTest extends TestCase
 	public function testRemove()
 	{
 		$path = Path::from($this->root->url(), 'testdir');
-		$this->directory = Directory::fromPath($path->get());
+		$this->directory = Directory::fromPath($path);
 		vfsStream::newDirectory('testdir')->at($this->root);
 		$this->assertTrue($this->directory->exists());
 
@@ -103,10 +103,10 @@ class DirectoryTest extends TestCase
 		$this->assertEquals(count($list), 2);
 
 		$this->assertTrue($list[0]->isFile());
-		$this->assertEquals($list[0]->getPath(), $this->root->url() . '/file1.txt');
+		$this->assertEquals($list[0]->getStringPath(), $this->root->url() . '/file1.txt');
 
 		$this->assertTrue($list[1]->isDir());
-		$this->assertEquals($list[1]->getPath(), $this->root->url() . '/subdir1');
+		$this->assertEquals($list[1]->getStringPath(), $this->root->url() . '/subdir1');
 	}
 
 	public function testList_Recursive()
@@ -120,16 +120,16 @@ class DirectoryTest extends TestCase
 		$this->assertEquals(count($list), 2);
 
 		$this->assertTrue($list[0]->isFile());
-		$this->assertEquals($list[0]->getPath(), $this->root->url() . '/file1.txt');
+		$this->assertEquals($list[0]->getStringPath(), $this->root->url() . '/file1.txt');
 
 		$this->assertTrue($list[1]->isFile());
-		$this->assertEquals($list[1]->getPath(), $this->root->url() . '/subdir1/file3.txt');
+		$this->assertEquals($list[1]->getStringPath(), $this->root->url() . '/subdir1/file3.txt');
 	}
 
 	public function testList_throwException()
 	{
 		$path = Path::from($this->root->url(), 'notfound');
-		$this->directory = Directory::fromPath($path->get());
+		$this->directory = Directory::fromPath($path);
 		$this->expectException(IOException::class);
 		$this->expectExceptionMessage('Directory "' . $path->get() . '" is not exists');
 		$this->directory->list();
@@ -146,10 +146,10 @@ class DirectoryTest extends TestCase
 		foreach ($iter as $item) {
 			if ($count === 0) {
 				$this->assertTrue($item->isFile());
-				$this->assertEquals($item->getPath(), $this->root->url() . '/file1.txt');
+				$this->assertEquals($item->getStringPath(), $this->root->url() . '/file1.txt');
 			} else {
 				$this->assertTrue($item->isDir());
-				$this->assertEquals($item->getPath(), $this->root->url() . '/subdir1');
+				$this->assertEquals($item->getStringPath(), $this->root->url() . '/subdir1');
 			}
 			$count++;
 		}

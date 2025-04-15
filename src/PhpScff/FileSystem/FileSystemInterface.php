@@ -4,7 +4,9 @@ namespace Hytmng\PhpScff\FileSystem;
 
 interface FileSystemInterface
 {
-	public function getPath(): string;
+	public function getPath(): Path;
+
+	public function getStringPath(): string;
 
 	public function isDir(): bool;
 

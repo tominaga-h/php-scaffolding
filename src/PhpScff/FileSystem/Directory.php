@@ -15,12 +15,22 @@ use Hytmng\PhpScff\FileSystem\Helper;
 class Directory extends AbstractFileSystem implements IteratorAggregate
 {
 	/**
+	 * Pathオブジェクトからオブジェクトを作成する
+	 *
+	 * @param Path $path
+	 * @return self
+	 */
+	public static function fromPath(Path $path): self
+	{
+		return new self($path, new Filesystem());
+	}
+	/**
 	 * ファイルパスからオブジェクトを作成する
 	 *
 	 * @param string $path
 	 * @return self
 	 */
-	public static function fromPath(string $path): self
+	public static function fromStringPath(string $path): self
 	{
 		return new self(new Path($path), new Filesystem());
 	}

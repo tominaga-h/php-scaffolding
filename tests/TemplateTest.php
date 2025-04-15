@@ -39,7 +39,7 @@ class TemplateTest extends TestCase
 
 	public function testGetPath()
 	{
-		$actual = $this->template->getPath();
+		$actual = $this->template->getStringPath();
 		$expected = $this->path->get();
 		$this->assertEquals($expected, $actual);
 	}
@@ -53,7 +53,7 @@ class TemplateTest extends TestCase
 
 	public function testFromPath()
 	{
-		$template = Template::fromPath($this->path->get());
+		$template = Template::fromPath($this->path);
 		$actual = $template->getFilename();
 		$expected = 'template.txt';
 		$this->assertEquals($expected, $actual);

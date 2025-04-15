@@ -18,9 +18,9 @@ class Helper
 	public static function convertObject(string $path): FileSystemInterface
 	{
 		if (\is_dir($path)) {
-			return Directory::fromPath($path);
+			return Directory::fromStringPath($path);
 		} else if (\is_file($path)) {
-			return File::fromPath($path);
+			return File::fromStringPath($path);
 		} else {
 			throw new \InvalidArgumentException('Invalid path: ' . $path);
 		}
