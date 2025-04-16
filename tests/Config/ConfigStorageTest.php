@@ -191,8 +191,10 @@ class ConfigStorageTest extends TestCase
 
 	public function testGetTemplate_throwException()
 	{
+		$this->configStorage->create();
+
 		$this->expectException(ExistenceException::class);
-		$this->expectExceptionMessage('Template "' . $name . '" is not exists.');
+		$this->expectExceptionMessage('Template "not_exists.txt" is not exists.');
 		$this->configStorage->getTemplate('not_exists.txt');
 	}
 
