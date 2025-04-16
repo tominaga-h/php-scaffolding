@@ -133,6 +133,24 @@ class ConfigStorage
 	/**
 	 * テンプレートを取得する
 	 *
+	 * @param string $name
+	 * @return Template
+	 * @throws ExistenceException
+	 */
+    public function getTemplate(string $name): Template
+    {
+        $filtered = $this->filterTemplate($name);
+        if (\count($filtered) > 0) {
+            return $filtered[0];
+        } else {
+            throw new ExistenceException('Template "' . $name . '" is not exists.');
+        }
+
+    }
+
+	/**
+	 * テンプレートを取得する
+	 *
 	 * @return Template[]
 	 */
 	public function getTemplates(): array
@@ -160,11 +178,19 @@ class ConfigStorage
 			$filename = $template;
 		}
 
+		return \count($this->filterTemplate($filename)) > 0;
+	}
+
+	/**
+	 * @param string $filename
+	 * @return Template[]
+	 */
+	private function filterTemplate(string $filename): array
+	{
 		$templates = $this->getTemplates();
-		$filtered = \array_filter($templates, function (Template $template) use ($filename) {
+		return \array_filter($templates, function (Template $template) use ($filename) {
 			return $template->getFilename() === $filename;
 		});
-		return \count($filtered) > 0;
 	}
 
 }

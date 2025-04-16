@@ -176,6 +176,26 @@ class ConfigStorageTest extends TestCase
 		$this->assertEquals('template.txt', $templates[0]->getFilename());
 	}
 
+	public function testGetTemplate()
+	{
+		$this->configStorage->create();
+
+		$templatePath = Path::from($this->testDir, '/templates/template.txt');
+		$file = File::fromPath($templatePath);
+		$file->write('test content');
+
+		$template = $this->configStorage->getTemplate('template.txt');
+		$this->assertInstanceOf(Template::class, $template);
+		$this->assertEquals('template.txt', $template->getFilename());
+	}
+
+	public function testGetTemplate_throwException()
+	{
+		$this->expectException(ExistenceException::class);
+		$this->expectExceptionMessage('Template "' . $name . '" is not exists.');
+		$this->configStorage->getTemplate('not_exists.txt');
+	}
+
 	public function testHasTemplate()
 	{
 		$this->configStorage->create();
