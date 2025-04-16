@@ -59,6 +59,14 @@ class TemplateTest extends TestCase
 		$this->assertEquals($expected, $actual);
 	}
 
+	public function testFromStringPath()
+	{
+		$template = Template::fromStringPath($this->path->get());
+		$actual = $template->getFilename();
+		$expected = 'template.txt';
+		$this->assertEquals($expected, $actual);
+	}
+
 	public function testCopy()
 	{
 		// テスト用のファイルを作成
