@@ -1,0 +1,20 @@
+#!/usr/bin/env php
+<?php
+
+require_once __DIR__ . '/../vendor/autoload.php';
+
+use Hytmng\PhpScff\Application;
+use Hytmng\PhpScff\Config\ConfigStorage;
+use Hytmng\PhpScff\Command\AddCommand;
+
+$configStorage = new ConfigStorage($_SERVER['HOME']);
+
+// 設定フォルダの作成
+if (!$configStorage->exists()) {
+	$configStorage->create();
+}
+
+$app = new Application('phscff', 'v0.1.0a');
+$app->setConfigStorage($configStorage);
+$app->add(new AddCommand());
+$app->run();
