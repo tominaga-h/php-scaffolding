@@ -106,6 +106,10 @@ class ConfigStorageTest extends TestCase
 		$this->assertFalse($configDir->exists());
 		$this->assertFalse($templateDir->exists());
 		$this->assertFalse($groupDir->exists());
+
+		$this->expectException(ExistenceException::class);
+		$this->expectExceptionMessage('Config directory is not exists');
+		$this->configStorage->remove();
 	}
 
 	public function testCreate_throwException()
@@ -142,6 +146,10 @@ class ConfigStorageTest extends TestCase
 
 		// コピーされたファイルの内容を確認
 		$this->assertEquals('test content', file_get_contents($expectedPath));
+
+		$this->expectException(ExistenceException::class);
+		$this->expectExceptionMessage('Template "template.txt" is already exists.');
+		$this->configStorage->addTemplate($template);
 	}
 
 	public function testAddTemplate_DirectoryNotExists()

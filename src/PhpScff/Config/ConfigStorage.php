@@ -120,8 +120,9 @@ class ConfigStorage
 	 */
 	public function addTemplate(Template $template): void
 	{
-		if ($this->hasTemplate($template->getFilename())) {
-			throw new ExistenceException('Template is already exists');
+		$filename = $template->getFilename();
+		if ($this->hasTemplate($filename)) {
+			throw new ExistenceException('Template "' . $filename . '" is already exists.');
 		}
 
 		$templateDir = $this->getTemplateDir();
