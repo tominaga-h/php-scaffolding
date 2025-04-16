@@ -6,6 +6,7 @@ use Hytmng\PhpScff\FileSystem\File;
 use Hytmng\PhpScff\FileSystem\Path;
 use Hytmng\PhpScff\FileSystem\PathTrait;
 use Symfony\Component\Filesystem\Filesystem;
+use Hytmng\PhpScff\Process\EditProcess;
 
 class Template
 {
@@ -75,5 +76,16 @@ class Template
 	{
 		$destPath = Path::from($dest, $this->getFilename());
 		$this->filesystem->copy($this->path->get(), $destPath->get());
+	}
+
+	/**
+	 * テンプレートを編集する
+	 *
+	 * @return bool 編集が成功した場合は true, 失敗した場合は false
+	 */
+	public function edit(): bool
+	{
+		$editor = new EditProcess();
+		return $editor->edit($this->path->get());
 	}
 }

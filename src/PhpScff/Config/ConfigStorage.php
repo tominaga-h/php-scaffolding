@@ -189,9 +189,10 @@ class ConfigStorage
 	private function filterTemplate(string $filename): array
 	{
 		$templates = $this->getTemplates();
-		return \array_filter($templates, function (Template $template) use ($filename) {
+		$filtered = \array_filter($templates, function (Template $template) use ($filename) {
 			return $template->getFilename() === $filename;
 		});
+		return \array_values($filtered);
 	}
 
 }

@@ -6,6 +6,7 @@ require_once __DIR__ . '/../vendor/autoload.php';
 use Hytmng\PhpScff\Application;
 use Hytmng\PhpScff\Config\ConfigStorage;
 use Hytmng\PhpScff\Command\AddCommand;
+use Hytmng\PhpScff\Command\EditCommand;
 
 $configStorage = new ConfigStorage($_SERVER['HOME']);
 
@@ -17,4 +18,5 @@ if (!$configStorage->exists()) {
 $app = new Application('phscff', 'v0.1.0a');
 $app->setConfigStorage($configStorage);
 $app->add(new AddCommand());
+$app->add(new EditCommand());
 $app->run();
