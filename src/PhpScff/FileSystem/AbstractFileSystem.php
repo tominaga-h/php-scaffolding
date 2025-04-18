@@ -15,6 +15,10 @@ abstract class AbstractFileSystem implements FileSystemInterface
 
 	protected Filesystem $fs;
 
+	abstract public static function fromPath(Path $path): self;
+
+	abstract public static function fromStringPath(string $path): self;
+
 	/**
 	 * コンストラクタ
 	 *
