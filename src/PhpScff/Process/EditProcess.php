@@ -12,6 +12,17 @@ class EditProcess
 	public function __construct()
 	{
 		$this->editor = $_SERVER['EDITOR'] ?? 'vim';
+		$this->checkEditor();
+	}
+
+	/**
+	 * エディタが存在するかどうかを確認する
+	 *
+	 * @return void
+	 * @throws ProcessException エディタが存在しない場合
+	 */
+	public function checkEditor(): void
+	{
 		if (!$this->editorExists()) {
 			$msg = 'Editor "' . $this->editor . '" is not found.' . PHP_EOL;
 			$msg .= 'Please set your editor to the `EDITOR` environment variable.';
@@ -19,9 +30,25 @@ class EditProcess
 		}
 	}
 
-	private function editorExists(): bool
+	/**
+	 * Processオブジェクトを作成する
+	 *
+	 * @param array $command コマンドとその引数の配列
+	 * @return Process
+	 */
+	public function createProcess(array $command): Process
 	{
-		$proc = new Process(['which', $this->editor]);
+		return new Process($command);
+	}
+
+	/**
+	 * エディタが存在するかどうかを確認する
+	 *
+	 * @return bool エディタが存在する場合は true, 存在しない場合は false
+	 */
+	public function editorExists(): bool
+	{
+		$proc = $this->createProcess(['which', $this->editor]);
 		$proc->run();
 		return $proc->isSuccessful();
 	}
@@ -34,7 +61,7 @@ class EditProcess
 	 */
 	public function edit(string $path): bool
 	{
-		$proc = new Process([$this->editor, $path]);
+		$proc = $this->createProcess([$this->editor, $path]);
 		$proc->setTty(true);
 		$proc->run();
 		return $proc->isSuccessful();
