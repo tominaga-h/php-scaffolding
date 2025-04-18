@@ -1,0 +1,9 @@
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+        public: true
+
+    Hytmng\PhpScff\Command\:
+        resource: '../src/PhpScff/Command/*'
+        tags: ['console.command']

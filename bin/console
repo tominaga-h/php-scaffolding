@@ -5,18 +5,12 @@ require_once __DIR__ . '/../vendor/autoload.php';
 
 use Hytmng\PhpScff\Application;
 use Hytmng\PhpScff\Config\ConfigStorage;
-use Hytmng\PhpScff\Command\AddCommand;
-use Hytmng\PhpScff\Command\EditCommand;
-
-$configStorage = new ConfigStorage($_SERVER['HOME']);
-
-// 設定フォルダの作成
-if (!$configStorage->exists()) {
-	$configStorage->create();
-}
+use Hytmng\PhpScff\Kernel;
 
 $app = new Application('phscff', 'v0.1.0a');
-$app->setConfigStorage($configStorage);
-$app->add(new AddCommand());
-$app->add(new EditCommand());
-$app->run();
+$configStorage = new ConfigStorage($_SERVER['HOME']);
+
+$kernel = new Kernel();
+$kernel->setConfigStorage($configStorage);
+$kernel->setApplication($app);
+$kernel->run();
