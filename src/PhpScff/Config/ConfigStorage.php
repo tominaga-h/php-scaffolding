@@ -157,12 +157,12 @@ class ConfigStorage
 	public function getTemplates(): array
 	{
 		$files = $this->getTemplateDir()->list(true);
-		return \array_map(function (FileSystemInterface $item) {
-			if ($item instanceof File) {
-				return Template::fromFile($item);
-			}
-			return $item;
-		}, $files);
+		$filtered = \array_filter($files, function (FileSystemInterface $item) {
+			return $item instanceof File;
+		});
+		return \array_map(function (File $item) {
+			return Template::fromFile($item);
+		}, $filtered);
 	}
 
 	/**
