@@ -42,15 +42,29 @@ class AddCommand extends Command
 
 		$group = $input->getOption('group');
 		if ($configStorage->hasTemplate($template, $group)) {
-			$message = 'Template already exists: "' . $filepath . '"';
-			if ($group !== null) {
-				$message .= ' in group "' . $group . '"';
-			}
-			throw new ExistenceException($message);
+			throw new ExistenceException($this->makeExceptionMsg($filepath, $group));
 		}
 		$configStorage->addTemplate($template, $group);
-		$output->writeln('Template added: <fg=yellow;options=bold>"' . $filepath . '"</>');
+		$output->writeln($this->makeSuccessMsg($filepath, $group));
 
 		return Command::SUCCESS;
+	}
+
+	private function makeExceptionMsg(string $filepath, ?string $group = null): string
+	{
+		$message = 'Template already exists: "' . $filepath . '"';
+		if ($group !== null) {
+			$message .= ' in group "' . $group . '"';
+		}
+		return $message;
+	}
+
+	private function makeSuccessMsg(string $filepath, ?string $group = null): string
+	{
+		$message = 'Template added: <fg=yellow;options=bold>' . $filepath . '</>';
+		if ($group !== null) {
+			$message .= ' in group: <fg=blue;options=bold>' . $group . '</>';
+		}
+		return $message;
 	}
 }
