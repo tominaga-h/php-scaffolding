@@ -229,6 +229,69 @@ class ConfigStorageTest extends TestCase
 		$file->write('test content');
 		$template = Template::fromFile($file);
 
-		$this->assertTrue($this->configStorage->hasTemplate($template));
-	}
+        $this->assertTrue($this->configStorage->hasTemplate($template));
+    }
+
+    public function testAddTemplateWithGroup(): void
+    {
+        // 設定ディレクトリを作成
+        $this->configStorage->create();
+
+        // テンプレートファイルを作成
+        $templatePath = $this->testDir . '/template.txt';
+        $file = File::fromStringPath($templatePath);
+        $file->write('test content');
+        $template = new Template($file, new Filesystem());
+
+        // グループ付きでテンプレートを追加
+        $group = 'group1';
+        $this->configStorage->addTemplate($template, $group);
+
+        // グループディレクトリにコピーされていることを確認
+        $templateDir = $this->configStorage->getTemplateDir();
+        $groupDir = Directory::fromPath($templateDir->getPath()->join($group));
+        $this->assertTrue($groupDir->exists());
+
+        $expectedPath = $groupDir->getStringPath() . '/template.txt';
+        $this->assertTrue($this->filesystem->exists($expectedPath));
+        $this->assertEquals('test content', file_get_contents($expectedPath));
+
+        // hasTemplate のグループチェック
+        $this->assertTrue($this->configStorage->hasTemplate('template.txt', $group));
+        $this->assertFalse($this->configStorage->hasTemplate('template.txt', 'otherGroup'));
+    }
+
+    public function testAddTemplateWithGroupDuplicate(): void
+    {
+        $this->configStorage->create();
+
+        $templatePath = $this->testDir . '/template.txt';
+        $file = File::fromStringPath($templatePath);
+        $file->write('test content');
+        $template = new Template($file, new Filesystem());
+
+        $group = 'group1';
+        $this->configStorage->addTemplate($template, $group);
+
+        // 同一グループ内で重複エラー
+        $this->expectException(ExistenceException::class);
+        $this->expectExceptionMessage('Template "template.txt" is already exists.');
+        $this->configStorage->addTemplate($template, $group);
+    }
+
+    public function testHasTemplateWithoutGroupWhenGroupExists(): void
+    {
+        $this->configStorage->create();
+
+        $templatePath = $this->testDir . '/template.txt';
+        $file = File::fromStringPath($templatePath);
+        $file->write('test content');
+        $template = new Template($file, new Filesystem());
+
+        $group = 'group1';
+        $this->configStorage->addTemplate($template, $group);
+
+        // グループ指定なしでは見つからない
+        $this->assertFalse($this->configStorage->hasTemplate('template.txt'));
+    }
 }

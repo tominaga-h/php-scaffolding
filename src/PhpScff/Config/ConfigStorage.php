@@ -112,23 +112,32 @@ class ConfigStorage
 		$this->getConfigDir()->remove();
 	}
 
-	/**
-	 * テンプレートを追加する
-	 *
-	 * @param Template $template
-	 * @throws ExistenceException
-	 */
-	public function addTemplate(Template $template): void
+    /**
+     * テンプレートを追加する
+     *
+     * @param Template   $template テンプレートオブジェクト
+     * @param string|null $group    グループ名（省略可）
+     * @throws ExistenceException
+     */
+    public function addTemplate(Template $template, ?string $group = null): void
 	{
 		$filename = $template->getFilename();
-		if ($this->hasTemplate($filename)) {
-			throw new ExistenceException('Template "' . $filename . '" is already exists.');
-		}
+        if ($this->hasTemplate($filename, $group)) {
+            throw new ExistenceException('Template "' . $filename . '" is already exists.');
+        }
 
-		$templateDir = $this->getTemplateDir();
-		if ($templateDir->exists()) {
-			$template->copy($templateDir->getStringPath());
-		}
+        $templateDir = $this->getTemplateDir();
+        // グループを指定していればサブディレクトリを使用
+        if ($group !== null) {
+            $groupDir = Directory::fromPath($templateDir->getPath()->join($group));
+            if (!$groupDir->exists()) {
+                $groupDir->create();
+            }
+            $templateDir = $groupDir;
+        }
+        if ($templateDir->exists()) {
+            $template->copy($templateDir->getStringPath());
+        }
 	}
 
 	/**
@@ -171,7 +180,15 @@ class ConfigStorage
 	 * @param string|Template $template
 	 * @return bool
 	 */
-	public function hasTemplate(string|Template $template): bool
+    /**
+     * テンプレートが存在するかどうかを確認する
+     *
+     * @param string|Template $template テンプレート名またはオブジェクト
+     * @param string|null     $group    グループ名（省略可）
+     * @return bool
+     * @throws ExistenceException
+     */
+    public function hasTemplate(string|Template $template, ?string $group = null): bool
 	{
 		if ($template instanceof Template) {
 			$filename = $template->getFilename();
@@ -179,7 +196,24 @@ class ConfigStorage
 			$filename = $template;
 		}
 
-		return \count($this->filterTemplate($filename)) > 0;
+        $templateDir = $this->getTemplateDir();
+        // グループ指定があればそのサブディレクトリを対象
+        if ($group !== null) {
+            $directory = Directory::fromPath($templateDir->getPath()->join($group));
+            // グループディレクトリがなければ該当テンプレートなし
+            if (!$directory->exists()) {
+                return false;
+            }
+        } else {
+            $directory = $templateDir;
+            // デフォルトではディレクトリの存在を確認
+            if (!$directory->exists()) {
+                throw new ExistenceException('Directory "' . $directory->getStringPath() . '" is not exists');
+            }
+        }
+        // 指定ディレクトリ内のファイル存在を直接チェック
+        $filePath = $directory->getStringPath() . '/' . $filename;
+        return File::fromStringPath($filePath)->exists();
 	}
 
 	/**
