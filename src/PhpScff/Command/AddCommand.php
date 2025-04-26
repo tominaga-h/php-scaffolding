@@ -6,6 +6,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Filesystem\Path as SymfonyPath;
 use Hytmng\PhpScff\Application;
 use Hytmng\PhpScff\Template;
 use Hytmng\PhpScff\FileSystem\File;
@@ -52,7 +53,8 @@ class AddCommand extends Command
 
 	private function makeExceptionMsg(string $filepath, ?string $group = null): string
 	{
-		$message = 'Template already exists: "' . $filepath . '"';
+		$filepath = SymfonyPath::makeAbsolute($filepath, \getcwd());
+		$message = 'Template "' . $filepath . '" already exists';
 		if (!\is_null($group)) {
 			$message .= ' in group "' . $group . '"';
 		}
@@ -61,9 +63,12 @@ class AddCommand extends Command
 
 	private function makeSuccessMsg(string $filepath, ?string $group = null): string
 	{
-		$message = 'Template added: <fg=yellow;options=bold>' . $filepath . '</>';
+		$filepath = SymfonyPath::makeAbsolute($filepath, \getcwd());
+		$message = 'Template "<fg=yellow;options=bold>' . $filepath . '</>" added';
 		if (!\is_null($group)) {
-			$message .= ' in group: <fg=blue;options=bold>' . $group . '</>';
+			$message .= ' in group "<fg=blue;options=bold>' . $group . '</>".';
+		} else {
+			$message .= '.';
 		}
 		return $message;
 	}
