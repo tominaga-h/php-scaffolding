@@ -9,6 +9,7 @@ use Symfony\Component\Filesystem\Filesystem;
 use Hytmng\PhpScff\Exception\ExistenceException;
 use Hytmng\PhpScff\FileSystem\Path;
 use Hytmng\PhpScff\FileSystem\Directory;
+use Hytmng\PhpScff\FileSystem\File;
 
 class DirectoryTest extends TestCase
 {
@@ -153,5 +154,54 @@ class DirectoryTest extends TestCase
 			}
 			$count++;
 		}
+	}
+
+	public function testGetSubDirPath(): void
+	{
+		// 単一のサブディレクトリ
+		$subDirPath = $this->directory->getSubDirPath('subdir1');
+		$this->assertInstanceOf(Path::class, $subDirPath);
+		$this->assertEquals($this->root->url() . '/subdir1', $subDirPath->get());
+
+		// 複数階層のサブディレクトリ
+		$subDirPath = $this->directory->getSubDirPath('subdir1', 'subdir2');
+		$this->assertEquals($this->root->url() . '/subdir1/subdir2', $subDirPath->get());
+	}
+
+	public function testGetSubDir(): void
+	{
+		// 単一のサブディレクトリ
+		$subDir = $this->directory->getSubDir('subdir1');
+		$this->assertInstanceOf(Directory::class, $subDir);
+		$this->assertEquals($this->root->url() . '/subdir1', $subDir->getStringPath());
+
+		// 複数階層のサブディレクトリ
+		$subDir = $this->directory->getSubDir('subdir1', 'subdir2');
+		$this->assertEquals($this->root->url() . '/subdir1/subdir2', $subDir->getStringPath());
+
+		// 存在確認（getSubDirは存在しないディレクトリのオブジェクトも返す）
+		$this->assertFalse($subDir->exists());
+		vfsStream::newDirectory('subdir1/subdir2', 0777)->at($this->root);
+		$this->assertTrue($subDir->exists());
+	}
+
+	public function testGetFilePath(): void
+	{
+		$filePath = $this->directory->getFilePath('test.txt');
+		$this->assertInstanceOf(Path::class, $filePath);
+		$this->assertEquals($this->root->url() . '/test.txt', $filePath->get());
+	}
+
+	public function testGetFile(): void
+	{
+		// ファイルオブジェクトの取得
+		$file = $this->directory->getFile('test.txt');
+		$this->assertInstanceOf(File::class, $file);
+		$this->assertEquals($this->root->url() . '/test.txt', $file->getStringPath());
+
+		// 存在確認（getFileは存在しないファイルのオブジェクトも返す）
+		$this->assertFalse($file->exists());
+		vfsStream::newFile('test.txt')->at($this->root);
+		$this->assertTrue($file->exists());
 	}
 }

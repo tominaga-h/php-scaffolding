@@ -10,6 +10,7 @@ use Hytmng\PhpScff\Application;
 use Hytmng\PhpScff\Template;
 use Hytmng\PhpScff\FileSystem\File;
 use Hytmng\PhpScff\Exception\ExistenceException;
+use Symfony\Component\Console\Input\InputOption;
 
 class AddCommand extends Command
 {
@@ -18,7 +19,8 @@ class AddCommand extends Command
 		$this
 			->setName('add')
 			->setDescription('Add a file as template')
-			->addArgument('file', InputArgument::REQUIRED, 'The file path to add');
+			->addArgument('file', InputArgument::REQUIRED, 'The file path to add')
+			->addOption('group', 'g', InputOption::VALUE_REQUIRED, 'Group name', null);
 	}
 
 	protected function execute(InputInterface $input, OutputInterface $output): int
@@ -38,13 +40,31 @@ class AddCommand extends Command
 
 		$template = Template::fromFile($file);
 
-		if ($configStorage->hasTemplate($template)) {
-			throw new ExistenceException('Template already exists: "' . $filepath . '"');
+		$group = $input->getOption('group');
+		if ($configStorage->hasTemplate($template, $group)) {
+			throw new ExistenceException($this->makeExceptionMsg($filepath, $group));
 		}
-
-		$configStorage->addTemplate($template);
-		$output->writeln('Template added: <fg=yellow;options=bold>"' . $filepath . '"</>');
+		$configStorage->addTemplate($template, $group);
+		$output->writeln($this->makeSuccessMsg($filepath, $group));
 
 		return Command::SUCCESS;
+	}
+
+	private function makeExceptionMsg(string $filepath, ?string $group = null): string
+	{
+		$message = 'Template already exists: "' . $filepath . '"';
+		if (!\is_null($group)) {
+			$message .= ' in group "' . $group . '"';
+		}
+		return $message;
+	}
+
+	private function makeSuccessMsg(string $filepath, ?string $group = null): string
+	{
+		$message = 'Template added: <fg=yellow;options=bold>' . $filepath . '</>';
+		if (!\is_null($group)) {
+			$message .= ' in group: <fg=blue;options=bold>' . $group . '</>';
+		}
+		return $message;
 	}
 }

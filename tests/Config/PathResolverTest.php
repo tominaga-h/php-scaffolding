@@ -30,10 +30,6 @@ class PathResolverTest extends TestCase
 		$this->assertEquals('path/to/config/templates', $this->path->getTemplateDir());
 	}
 
-	public function testGroupDir()
-	{
-		$this->assertEquals('path/to/config/groups', $this->path->getGroupDir());
-	}
 
 	public function testGetPath()
 	{
