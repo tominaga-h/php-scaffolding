@@ -216,19 +216,16 @@ class ConfigStorage
 	/**
 	 * 全てのグループとそのテンプレートの一覧を取得する
 	 *
-	 * @return array<string, string[]> グループ名をキー、テンプレートファイル名の配列を値とする連想配列
+	 * @return array<string, Template[]> グループ名をキー、テンプレートオブジェクトの配列を値とする連想配列
 	 */
-	public function getGroupsWithTemplates(): array
+	public function getTemplatesByGroup(): array
 	{
 		$items = $this->getTemplateDir()->list(false);
 		$groups = [];
 		foreach ($items as $item) {
-			if ($item->isDir()) {
-				$groupName = $item->getPath()->basename();
-				$templates = \array_map(
-					fn(Template $template) => $template->getFilename(),
-					$this->getTemplates($groupName)
-				);
+			if ($item instanceof Directory) {
+				$groupName = $item->getDirName();
+				$templates = $this->getTemplates($groupName);
 				if (!empty($templates)) {
 					$groups[$groupName] = $templates;
 				}
@@ -247,8 +244,8 @@ class ConfigStorage
 		$items = $this->getTemplateDir()->list(false);
 		$groups = [];
 		foreach ($items as $item) {
-			if ($item->isDir()) {
-				$groups[] = $item->getPath()->basename();
+			if ($item instanceof Directory) {
+				$groups[] = $item->getDirName();
 			}
 		}
 		return $groups;

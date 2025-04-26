@@ -37,6 +37,16 @@ class Directory extends AbstractFileSystem implements IteratorAggregate
 	}
 
 	/**
+	 * ディレクトリ名を取得する
+	 *
+	 * @return string
+	 */
+	public function getDirName(): string
+	{
+		return $this->path->basename();
+	}
+
+	/**
 	 * ディレクトリを作成する
 	 *
 	 * @throws ExistenceException

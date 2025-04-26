@@ -7,6 +7,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Hytmng\PhpScff\Application;
+use Hytmng\PhpScff\Template;
 
 /**
  * List existing group folders.
@@ -31,7 +32,7 @@ class ListCommand extends Command
 		$isAll = $input->getOption('all');
 
 		if ($isAll) {
-			$groups = $configStorage->getGroupsWithTemplates();
+			$groups = $configStorage->getTemplatesByGroup();
 			$this->outputGroups($output, $groups, true);
 		} else {
 			$groups = $configStorage->getGroups();
@@ -51,6 +52,8 @@ class ListCommand extends Command
 	private function outputGroups(OutputInterface $output, array $groups, bool $showTemplates): void
 	{
 		$title = $showTemplates ? 'Templates' : 'Groups';
+		$symbol = '├── ';
+		$lastSymbol = '└── ';
 
 		if (empty($groups)) {
 			$output->writeln("<comment>$title not found.</comment>");
@@ -61,14 +64,24 @@ class ListCommand extends Command
 
 		if ($showTemplates) {
 			foreach ($groups as $groupName => $templates) {
-				$output->writeln('  - <fg=cyan;options=bold>' . $groupName . '</>');
-				foreach ($templates as $filename) {
-					$output->writeln('    - ' . $filename);
+				$output->writeln("  - <fg=cyan;options=bold>$groupName</>");
+				$count = 0;
+				$last = \count($templates) - 1;
+				foreach ($templates as $template) {
+					if ($template instanceof Template) {
+						$filename = $template->getFilename();
+						if ($count === $last) {
+							$output->writeln("    $lastSymbol $filename");
+						} else {
+							$output->writeln("    $symbol $filename");
+						}
+					}
+					$count++;
 				}
 			}
 		} else {
 			foreach ($groups as $group) {
-				$output->writeln('  - <fg=cyan;options=bold>' . $group . '</>');
+				$output->writeln("  - <fg=cyan;options=bold>$group</>");
 			}
 		}
 	}

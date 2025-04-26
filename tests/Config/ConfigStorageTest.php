@@ -233,7 +233,7 @@ class ConfigStorageTest extends TestCase
 
         // グループディレクトリにコピーされていることを確認
         $templateDir = $this->configStorage->getTemplateDir();
-        $groupDir = Directory::fromPath($templateDir->getPath()->join($group));
+        $groupDir = $templateDir->getSubDir($group);
         $this->assertTrue($groupDir->exists());
 
         $expectedPath = $groupDir->getStringPath() . '/template.txt';
@@ -277,5 +277,101 @@ class ConfigStorageTest extends TestCase
 
         // グループ指定なしでは見つからない
         $this->assertFalse($this->configStorage->hasTemplate('template.txt'));
+    }
+
+    public function testGetTemplatesWithGroup(): void
+    {
+        $this->configStorage->create();
+
+        // グループ1のテンプレート作成
+        $group1 = 'group1';
+        $template1Path = $this->testDir . '/template1.txt';
+        $file1 = File::fromStringPath($template1Path);
+        $file1->write('content1');
+        // 新しいファイル名でTemplateオブジェクトを作成
+        $newFile1 = File::fromStringPath($this->testDir . '/template.txt');
+        $newFile1->write('content1', true);
+        $template1 = new Template($newFile1, new Filesystem());
+        $this->configStorage->addTemplate($template1, $group1);
+
+        // グループ2のテンプレート作成
+        $group2 = 'group2';
+        $template2Path = $this->testDir . '/template2.txt';
+        $file2 = File::fromStringPath($template2Path);
+        $file2->write('content2');
+        // 新しいファイル名でTemplateオブジェクトを作成
+        $newFile2 = File::fromStringPath($this->testDir . '/template.txt');
+        $newFile2->write('content2', true);
+        $template2 = new Template($newFile2, new Filesystem());
+        $this->configStorage->addTemplate($template2, $group2);
+
+        // グループ1のテンプレートのみ取得
+        $templates = $this->configStorage->getTemplates($group1);
+        $this->assertCount(1, $templates);
+        $this->assertEquals('template.txt', $templates[0]->getFilename());
+
+        // 存在しないグループを指定した場合は例外
+        $this->expectException(ExistenceException::class);
+        $this->expectExceptionMessage('Group "not_exists" is not exists');
+        $this->configStorage->getTemplates('not_exists');
+    }
+
+    public function testGetTemplateWithGroup(): void
+    {
+        $this->configStorage->create();
+
+        // 2つのグループに同じ名前のテンプレートを作成
+        $group1 = 'group1';
+        $group2 = 'group2';
+
+        // グループ1のテンプレート
+        $template1Path = $this->testDir . '/template1.txt';
+        $file1 = File::fromStringPath($template1Path);
+        $file1->write('content1');
+        // 新しいファイル名でTemplateオブジェクトを作成
+        $newFile1 = File::fromStringPath($this->testDir . '/template.txt');
+        $newFile1->write('content1', true);
+        $template1 = new Template($newFile1, new Filesystem());
+        $this->configStorage->addTemplate($template1, $group1);
+
+        // グループ2のテンプレート（同じ名前で異なるファイル）
+        $template2Path = $this->testDir . '/template2.txt';
+        $file2 = File::fromStringPath($template2Path);
+        $file2->write('content2');
+        // 新しいファイル名でTemplateオブジェクトを作成
+        $newFile2 = File::fromStringPath($this->testDir . '/template.txt');
+        $newFile2->write('content2', true);
+        $template2 = new Template($newFile2, new Filesystem());
+        $this->configStorage->addTemplate($template2, $group2);
+
+        // グループを指定してテンプレートを取得
+        $template = $this->configStorage->getTemplate('template.txt', $group1);
+        $this->assertEquals('template.txt', $template->getFilename());
+        $templateDir = $this->configStorage->getTemplateDir();
+        $groupDir = $templateDir->getSubDir($group1);
+        $this->assertEquals('content1', file_get_contents($groupDir->getFile('template.txt')->getStringPath()));
+
+        // 存在しないグループを指定した場合は例外
+        $this->expectException(ExistenceException::class);
+        $this->expectExceptionMessage('Group "not_exists" is not exists');
+        $this->configStorage->getTemplate('template.txt', 'not_exists');
+    }
+
+    public function testGetTemplateNotFoundInGroup(): void
+    {
+        $this->configStorage->create();
+
+        // グループを作成
+        $group = 'group1';
+        $templatePath = $this->testDir . '/template1.txt';
+        $file = File::fromStringPath($templatePath);
+        $file->write('content1');
+        $template = new Template($file, new Filesystem());
+        $this->configStorage->addTemplate($template, $group);
+
+        // 存在しないテンプレートを指定した場合は例外
+        $this->expectException(ExistenceException::class);
+        $this->expectExceptionMessage('Template "not_exists.txt" is not exists.');
+        $this->configStorage->getTemplate('not_exists.txt', $group);
     }
 }
