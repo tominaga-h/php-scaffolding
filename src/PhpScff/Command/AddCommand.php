@@ -53,7 +53,7 @@ class AddCommand extends Command
 	private function makeExceptionMsg(string $filepath, ?string $group = null): string
 	{
 		$message = 'Template already exists: "' . $filepath . '"';
-		if ($group !== null) {
+		if (!\is_null($group)) {
 			$message .= ' in group "' . $group . '"';
 		}
 		return $message;
@@ -62,7 +62,7 @@ class AddCommand extends Command
 	private function makeSuccessMsg(string $filepath, ?string $group = null): string
 	{
 		$message = 'Template added: <fg=yellow;options=bold>' . $filepath . '</>';
-		if ($group !== null) {
+		if (!\is_null($group)) {
 			$message .= ' in group: <fg=blue;options=bold>' . $group . '</>';
 		}
 		return $message;

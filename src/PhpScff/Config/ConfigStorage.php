@@ -6,6 +6,7 @@ use Hytmng\PhpScff\Template;
 use Hytmng\PhpScff\Config\PathResolver;
 use Hytmng\PhpScff\FileSystem\File;
 use Hytmng\PhpScff\FileSystem\Directory;
+use Hytmng\PhpScff\FileSystem\Path;
 use Hytmng\PhpScff\FileSystem\FileSystemInterface;
 use Hytmng\PhpScff\Exception\ExistenceException;
 
@@ -105,7 +106,7 @@ class ConfigStorage
      * テンプレートを追加する
      *
      * @param Template   $template テンプレートオブジェクト
-     * @param string|null $group    グループ名（省略可）
+     * @param string|null $group    指定するとそのグループ内にテンプレートを追加する
      * @throws ExistenceException
      */
     public function addTemplate(Template $template, ?string $group = null): void
@@ -116,9 +117,9 @@ class ConfigStorage
         }
 
         $templateDir = $this->getTemplateDir();
-        // グループを指定していればサブディレクトリを使用
-        if ($group !== null) {
-            $groupDir = Directory::fromPath($templateDir->getPath()->join($group));
+        if (!\is_null($group)) {
+            $groupDir = $templateDir->getSubDir($group);
+			// グループの存在は任意
             if (!$groupDir->exists()) {
                 $groupDir->create();
             }
@@ -132,29 +133,45 @@ class ConfigStorage
 	/**
 	 * テンプレートを取得する
 	 *
-	 * @param string $name
+	 * @param string      $name テンプレートファイル名
+	 * @param string|null $group 指定するとそのグループ内のテンプレートを取得する
 	 * @return Template
 	 * @throws ExistenceException
 	 */
-    public function getTemplate(string $name): Template
+    public function getTemplate(string $name, ?string $group = null): Template
     {
-        $filtered = $this->filterTemplate($name);
+		$templates = $this->getTemplates($group);
+		$filtered = \array_filter($templates, function (Template $template) use ($name) {
+			return $template->getFilename() === $name;
+		});
         if (\count($filtered) > 0) {
             return $filtered[0];
         } else {
             throw new ExistenceException('Template "' . $name . '" is not exists.');
         }
-
     }
 
 	/**
-	 * テンプレートを取得する
+	 * すべてのテンプレートを取得する
 	 *
+	 * @param string|null $group 指定するとそのグループ内のテンプレートのみを取得する
 	 * @return Template[]
+	 * @throws ExistenceException グループディレクトリがない場合
 	 */
-	public function getTemplates(): array
+	public function getTemplates(?string $group = null): array
 	{
-		$files = $this->getTemplateDir()->list(true);
+		$templateDir = $this->getTemplateDir();
+		if (!\is_null($group)) {
+			$groupDir = $templateDir->getSubDir($group);
+			// グループの存在は必須
+			if (!$groupDir->exists()) {
+				throw new ExistenceException('Group "' . $group . '" is not exists');
+			}
+			$files = $groupDir->list(false); // グループ内のファイルのみ
+		} else {
+			$files = $templateDir->list(true); // テンプレートフォルダ内のファイルすべて
+		}
+
 		$filtered = \array_filter($files, function (FileSystemInterface $item) {
 			return $item instanceof File;
 		});
@@ -163,17 +180,11 @@ class ConfigStorage
 		}, $filtered);
 	}
 
-	/**
-	 * テンプレートが存在するかどうかを確認する
-	 *
-	 * @param string|Template $template
-	 * @return bool
-	 */
     /**
      * テンプレートが存在するかどうかを確認する
      *
-     * @param string|Template $template テンプレート名またはオブジェクト
-     * @param string|null     $group    グループ名（省略可）
+     * @param string|Template $template テンプレート名またはTemplateオブジェクト
+     * @param string|null     $group    指定するとそのグループ内のテンプレートを対象とする
      * @return bool
      * @throws ExistenceException
      */
@@ -186,36 +197,61 @@ class ConfigStorage
 		}
 
         $templateDir = $this->getTemplateDir();
-        // グループ指定があればそのサブディレクトリを対象
-        if ($group !== null) {
-            $directory = Directory::fromPath($templateDir->getPath()->join($group));
-            // グループディレクトリがなければ該当テンプレートなし
+        if (!\is_null($group)) {
+            $directory = $templateDir->getSubDir($group);
+			// グループの存在は任意
             if (!$directory->exists()) {
                 return false;
             }
         } else {
             $directory = $templateDir;
-            // デフォルトではディレクトリの存在を確認
             if (!$directory->exists()) {
                 throw new ExistenceException('Directory "' . $directory->getStringPath() . '" is not exists');
             }
         }
         // 指定ディレクトリ内のファイル存在を直接チェック
-        $filePath = $directory->getStringPath() . '/' . $filename;
-        return File::fromStringPath($filePath)->exists();
+        return $directory->getFile($filename)->exists();
 	}
 
 	/**
-	 * @param string $filename
-	 * @return Template[]
+	 * 全てのグループとそのテンプレートの一覧を取得する
+	 *
+	 * @return array<string, string[]> グループ名をキー、テンプレートファイル名の配列を値とする連想配列
 	 */
-	private function filterTemplate(string $filename): array
+	public function getGroupsWithTemplates(): array
 	{
-		$templates = $this->getTemplates();
-		$filtered = \array_filter($templates, function (Template $template) use ($filename) {
-			return $template->getFilename() === $filename;
-		});
-		return \array_values($filtered);
+		$items = $this->getTemplateDir()->list(false);
+		$groups = [];
+		foreach ($items as $item) {
+			if ($item->isDir()) {
+				$groupName = $item->getPath()->basename();
+				$templates = \array_map(
+					fn(Template $template) => $template->getFilename(),
+					$this->getTemplates($groupName)
+				);
+				if (!empty($templates)) {
+					$groups[$groupName] = $templates;
+				}
+			}
+		}
+		return $groups;
+	}
+
+	/**
+	 * 全てのグループ名を取得する
+	 *
+	 * @return string[] グループ名の配列
+	 */
+	public function getGroups(): array
+	{
+		$items = $this->getTemplateDir()->list(false);
+		$groups = [];
+		foreach ($items as $item) {
+			if ($item->isDir()) {
+				$groups[] = $item->getPath()->basename();
+			}
+		}
+		return $groups;
 	}
 
 }

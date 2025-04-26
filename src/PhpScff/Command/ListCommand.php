@@ -4,6 +4,7 @@ namespace Hytmng\PhpScff\Command;
 
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Hytmng\PhpScff\Application;
 
@@ -12,23 +13,14 @@ use Hytmng\PhpScff\Application;
  */
 class ListCommand extends Command
 {
-	/**
-	 * Configure the list command.
-	 */
 	protected function configure(): void
 	{
 		$this
 			->setName('list')
-			->setDescription('List existing group folders');
+			->setDescription('List existing group folders')
+			->addOption('all', 'a', InputOption::VALUE_NONE, 'List all templates under group folders');
 	}
 
-	/**
-	 * Execute the list command.
-	 *
-	 * @param InputInterface  $input
-	 * @param OutputInterface $output
-	 * @return int Exit code
-	 */
 	protected function execute(InputInterface $input, OutputInterface $output): int
 	{
 		$app = $this->getApplication();
@@ -36,26 +28,48 @@ class ListCommand extends Command
 			return Command::FAILURE;
 		}
 		$configStorage = $app->getConfigStorage();
-		$templateDir = $configStorage->getTemplateDir();
+		$isAll = $input->getOption('all');
 
-		// Gather group folders (non-recursive directories)
-		$items = $templateDir->list(false);
-		$groups = [];
-		foreach ($items as $item) {
-			if ($item->isDir()) {
-				$groups[] = $item->getPath()->basename();
-			}
+		if ($isAll) {
+			$groups = $configStorage->getGroupsWithTemplates();
+			$this->outputGroups($output, $groups, true);
+		} else {
+			$groups = $configStorage->getGroups();
+			$this->outputGroups($output, $groups, false);
 		}
 
+		return Command::SUCCESS;
+	}
+
+	/**
+	 * グループ一覧を出力する
+	 *
+	 * @param OutputInterface $output
+	 * @param array          $groups グループ一覧（テンプレート表示時は連想配列、それ以外は通常配列）
+	 * @param bool           $showTemplates テンプレートを表示するかどうか
+	 */
+	private function outputGroups(OutputInterface $output, array $groups, bool $showTemplates): void
+	{
+		$title = $showTemplates ? 'Templates' : 'Groups';
+
 		if (empty($groups)) {
-			$output->writeln('<comment>No group folders found.</comment>');
+			$output->writeln("<comment>$title not found.</comment>");
+			return;
+		}
+
+		$output->writeln("<info>$title:</info>");
+
+		if ($showTemplates) {
+			foreach ($groups as $groupName => $templates) {
+				$output->writeln('  - <fg=cyan;options=bold>' . $groupName . '</>');
+				foreach ($templates as $filename) {
+					$output->writeln('    - ' . $filename);
+				}
+			}
 		} else {
-			$output->writeln('<info>Group folders:</info>');
 			foreach ($groups as $group) {
 				$output->writeln('  - <fg=cyan;options=bold>' . $group . '</>');
 			}
 		}
-
-		return Command::SUCCESS;
 	}
 }

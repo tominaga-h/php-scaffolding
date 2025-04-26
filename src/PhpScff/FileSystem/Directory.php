@@ -108,4 +108,48 @@ class Directory extends AbstractFileSystem implements IteratorAggregate
 		return new \ArrayIterator($this->list());
 	}
 
+	/**
+	 * サブディレクトリのパスを取得する
+	 *
+	 * @param string ...$dirs サブディレクトリ名
+	 * @return Path
+	 */
+	public function getSubDirPath(string ...$dirs): Path
+	{
+		return $this->path->join(...$dirs);
+	}
+
+	/**
+	 * サブディレクトリのDirectoryオブジェクトを取得する
+	 *
+	 * @param string ...$dirs サブディレクトリ名
+	 * @return self
+	 */
+	public function getSubDir(string ...$dirs): self
+	{
+		return self::fromPath($this->getSubDirPath(...$dirs));
+	}
+
+	/**
+	 * ディレクトリ内のファイルパスを取得する
+	 *
+	 * @param string $filename ファイル名
+	 * @return Path
+	 */
+	public function getFilePath(string $filename): Path
+	{
+		return $this->path->join($filename);
+	}
+
+	/**
+	 * ディレクトリ内のファイルオブジェクトを取得する
+	 *
+	 * @param string $filename ファイル名
+	 * @return File
+	 */
+	public function getFile(string $filename): File
+	{
+		return File::fromPath($this->getFilePath($filename));
+	}
+
 }
