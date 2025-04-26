@@ -14,6 +14,8 @@ class ConfigStorage
 {
 	private PathResolver $resolver;
 
+	public const DEFAULT_GROUP = 'default';
+
 	/**
 	 * コンストラクタ
 	 *

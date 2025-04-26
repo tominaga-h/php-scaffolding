@@ -6,12 +6,13 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Filesystem\Path as SymfonyPath;
 use Hytmng\PhpScff\Application;
 use Hytmng\PhpScff\Template;
 use Hytmng\PhpScff\FileSystem\File;
 use Hytmng\PhpScff\Exception\ExistenceException;
-use Symfony\Component\Console\Input\InputOption;
+use Hytmng\PhpScff\Config\ConfigStorage;
 
 class AddCommand extends Command
 {
@@ -41,7 +42,7 @@ class AddCommand extends Command
 
 		$template = Template::fromFile($file);
 
-		$group = $input->getOption('group');
+		$group = $input->getOption('group') ?? ConfigStorage::DEFAULT_GROUP;
 		if ($configStorage->hasTemplate($template, $group)) {
 			throw new ExistenceException($this->makeExceptionMsg($filepath, $group));
 		}
