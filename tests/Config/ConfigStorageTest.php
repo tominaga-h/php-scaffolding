@@ -374,4 +374,84 @@ class ConfigStorageTest extends TestCase
         $this->expectExceptionMessage('Template "not_exists.txt" is not exists.');
         $this->configStorage->getTemplate('not_exists.txt', $group);
     }
+
+    public function testGetTemplatesByGroup(): void
+    {
+        $this->configStorage->create();
+
+        // グループ1のテンプレート作成
+        $group1 = 'group1';
+        $template1Path = $this->testDir . '/template1.txt';
+        $file1 = File::fromStringPath($template1Path);
+        $file1->write('content1');
+        $template1 = new Template($file1, new Filesystem());
+        $this->configStorage->addTemplate($template1, $group1);
+
+        // グループ2のテンプレート作成（2つのファイル）
+        $group2 = 'group2';
+        $template2Path = $this->testDir . '/template2.txt';
+        $file2 = File::fromStringPath($template2Path);
+        $file2->write('content2');
+        $template2 = new Template($file2, new Filesystem());
+        $this->configStorage->addTemplate($template2, $group2);
+
+        $template3Path = $this->testDir . '/template3.txt';
+        $file3 = File::fromStringPath($template3Path);
+        $file3->write('content3');
+        $template3 = new Template($file3, new Filesystem());
+        $this->configStorage->addTemplate($template3, $group2);
+
+        // 空のグループ3を作成
+        $group3 = 'group3';
+        $templateDir = $this->configStorage->getTemplateDir();
+        $groupDir3 = $templateDir->getSubDir($group3);
+        $groupDir3->create();
+
+        // グループごとのテンプレート取得
+        $templatesByGroup = $this->configStorage->getTemplatesByGroup();
+
+        // 検証
+        $this->assertCount(2, $templatesByGroup); // 空のグループは含まれない
+        $this->assertArrayHasKey($group1, $templatesByGroup);
+        $this->assertArrayHasKey($group2, $templatesByGroup);
+
+        // グループ1の検証
+        $this->assertCount(1, $templatesByGroup[$group1]);
+        $this->assertEquals('template1.txt', $templatesByGroup[$group1][0]->getFilename());
+
+        // グループ2の検証
+        $this->assertCount(2, $templatesByGroup[$group2]);
+        $filenames = array_map(function($template) {
+            return $template->getFilename();
+        }, $templatesByGroup[$group2]);
+        $this->assertContains('template2.txt', $filenames);
+        $this->assertContains('template3.txt', $filenames);
+    }
+
+    public function testGetGroups(): void
+    {
+        $this->configStorage->create();
+
+        // グループディレクトリを作成
+        $templateDir = $this->configStorage->getTemplateDir();
+        $groups = ['group1', 'group2', 'group3'];
+        foreach ($groups as $group) {
+            $groupDir = $templateDir->getSubDir($group);
+            $groupDir->create();
+        }
+
+        // ファイルも作成（グループではない）
+        $filePath = $this->testDir . '/templates/file.txt';
+        $file = File::fromStringPath($filePath);
+        $file->write('content');
+
+        // グループ一覧を取得
+        $actualGroups = $this->configStorage->getGroups();
+
+        // 検証
+        $this->assertCount(3, $actualGroups);
+        foreach ($groups as $group) {
+            $this->assertContains($group, $actualGroups);
+        }
+    }
 }
