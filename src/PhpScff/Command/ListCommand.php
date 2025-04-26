@@ -8,6 +8,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Hytmng\PhpScff\Application;
 use Hytmng\PhpScff\Template;
+use Hytmng\PhpScff\Config\ConfigStorage;
 
 /**
  * List existing group folders.
@@ -64,7 +65,8 @@ class ListCommand extends Command
 
 		if ($showTemplates) {
 			foreach ($groups as $groupName => $templates) {
-				$output->writeln("  - <fg=cyan;options=bold>$groupName</>");
+				$color = $groupName === ConfigStorage::DEFAULT_GROUP ? 'yellow' : 'cyan';
+				$output->writeln("  - <fg=$color;options=bold>$groupName</>");
 				$count = 0;
 				$last = \count($templates) - 1;
 				foreach ($templates as $template) {
@@ -81,7 +83,8 @@ class ListCommand extends Command
 			}
 		} else {
 			foreach ($groups as $group) {
-				$output->writeln("  - <fg=cyan;options=bold>$group</>");
+				$color = $group === ConfigStorage::DEFAULT_GROUP ? 'yellow' : 'cyan';
+				$output->writeln("  - <fg=$color;options=bold>$group</>");
 			}
 		}
 	}
