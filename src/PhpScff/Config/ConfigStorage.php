@@ -54,15 +54,6 @@ class ConfigStorage
 		return Directory::fromStringPath($this->resolver->getTemplateDir());
 	}
 
-	/**
-	 * グループフォルダのDirectoryオブジェクトを返す
-	 *
-	 * @return Directory
-	 */
-	public function getGroupDir(): Directory
-	{
-		return Directory::fromStringPath($this->resolver->getGroupDir());
-	}
 
 	/**
 	 * 設定フォルダが存在するかどうかを確認する
@@ -90,7 +81,6 @@ class ConfigStorage
 
 		// 下層フォルダの作成
 		$this->getTemplateDir()->create();
-		$this->getGroupDir()->create();
 	}
 
 	/**
@@ -106,7 +96,6 @@ class ConfigStorage
 
 		// 下層フォルダの削除
 		$this->getTemplateDir()->remove();
-		$this->getGroupDir()->remove();
 
 		// 設定フォルダの削除
 		$this->getConfigDir()->remove();

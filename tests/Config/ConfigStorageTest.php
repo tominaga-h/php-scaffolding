@@ -53,15 +53,6 @@ class ConfigStorageTest extends TestCase
 		$this->assertEquals($expected, $actual);
 	}
 
-	public function testGroupDir()
-	{
-		$groupDir = $this->configStorage->getGroupDir();
-		$this->assertInstanceOf(Directory::class, $groupDir);
-
-		$actual = $groupDir->getStringPath();
-		$expected = $this->testDir . '/groups';
-		$this->assertEquals($expected, $actual);
-	}
 
 	public function testExists()
 	{
@@ -79,11 +70,8 @@ class ConfigStorageTest extends TestCase
 		$configDir = $this->configStorage->getConfigDir();
 		$this->assertTrue($configDir->exists());
 
-		$templateDir = $this->configStorage->getTemplateDir();
-		$this->assertTrue($templateDir->exists());
-
-		$groupDir = $this->configStorage->getGroupDir();
-		$this->assertTrue($groupDir->exists());
+        $templateDir = $this->configStorage->getTemplateDir();
+        $this->assertTrue($templateDir->exists());
 	}
 
 	public function testRemove()
@@ -94,18 +82,14 @@ class ConfigStorageTest extends TestCase
 		$configDir = $this->configStorage->getConfigDir();
 		$this->assertTrue($configDir->exists());
 
-		$templateDir = $this->configStorage->getTemplateDir();
-		$this->assertTrue($templateDir->exists());
-
-		$groupDir = $this->configStorage->getGroupDir();
-		$this->assertTrue($groupDir->exists());
+        $templateDir = $this->configStorage->getTemplateDir();
+        $this->assertTrue($templateDir->exists());
 
 		$this->configStorage->remove();
 		$this->assertFalse($this->configStorage->exists());
 
-		$this->assertFalse($configDir->exists());
-		$this->assertFalse($templateDir->exists());
-		$this->assertFalse($groupDir->exists());
+        $this->assertFalse($configDir->exists());
+        $this->assertFalse($templateDir->exists());
 
 		$this->expectException(ExistenceException::class);
 		$this->expectExceptionMessage('Config directory is not exists');

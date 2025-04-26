@@ -33,9 +33,5 @@ class PathResolver
 		return $this->configDir->join('templates')->get();
 	}
 
-	public function getGroupDir(): string
-	{
-		return $this->configDir->join('groups')->get();
-	}
 
 }
