@@ -9,7 +9,7 @@ use FilesystemIterator;
 use Symfony\Component\Filesystem\Filesystem;
 use Hytmng\PhpScff\FileSystem\AbstractFileSystem;
 use Hytmng\PhpScff\FileSystem\Path;
-use Hytmng\PhpScff\FileSystem\Helper;
+use Hytmng\PhpScff\Helper\Helper;
 use Hytmng\PhpScff\FileSystem\FileSystemInterface;
 use Hytmng\PhpScff\Exception\ExistenceException;
 

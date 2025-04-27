@@ -1,12 +1,12 @@
 <?php
 
-namespace Tests\PhpScff\FileSystem;
+namespace Tests\PhpScff\Helper;
 
 use PHPUnit\Framework\TestCase;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamDirectory;
 use org\bovigo\vfs\vfsStreamFile;
-use Hytmng\PhpScff\FileSystem\Helper;
+use Hytmng\PhpScff\Helper\Helper;
 use Hytmng\PhpScff\FileSystem\Directory;
 use Hytmng\PhpScff\FileSystem\File;
 

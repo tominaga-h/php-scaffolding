@@ -1,6 +1,6 @@
 <?php
 
-namespace Hytmng\PhpScff\FileSystem;
+namespace Hytmng\PhpScff\Helper;
 
 use Hytmng\PhpScff\FileSystem\File;
 use Hytmng\PhpScff\FileSystem\Directory;
