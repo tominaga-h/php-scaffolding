@@ -11,11 +11,11 @@ class MsgTest extends TestCase
     {
         // テンプレートのみのケース
         $result = Msg::makeTemplateMsg(Msg::FLG_ADDED, 'test.php', null);
-        $this->assertEquals('Template "' . getcwd() . '/test.php" added.', $result);
+        $this->assertEquals('Template "test.php" added.', $result);
 
         // グループ付きのケース
         $result = Msg::makeTemplateMsg(Msg::FLG_ADDED, 'test.php', 'testGroup');
-        $this->assertEquals('Template "' . getcwd() . '/test.php" added in group "testGroup".', $result);
+        $this->assertEquals('Template "test.php" added in group "testGroup".', $result);
 
         // 色付きのケース
         $result = Msg::makeTemplateMsg(
@@ -28,7 +28,7 @@ class MsgTest extends TestCase
             []
         );
         $this->assertEquals(
-            'Template "<fg=green;options=bold>'. getcwd() . '/test.php</>" added in group "<fg=blue>testGroup</>".',
+            'Template "<fg=green;options=bold>test.php</>" added in group "<fg=blue>testGroup</>".',
             $result
         );
     }

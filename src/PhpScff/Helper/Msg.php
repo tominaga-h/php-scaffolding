@@ -36,8 +36,6 @@ class Msg
 		array $groupOptions = []
 	): string
 	{
-		$template = SymfonyPath::makeAbsolute($template, \getcwd());
-
 		$msg = 'Template' . self::SPACE;
 		$msg .= self::quote(self::style($template, $templateColor, $templateOptions)) . self::SPACE;
 		$msg .= self::getFlgMsg($flg);

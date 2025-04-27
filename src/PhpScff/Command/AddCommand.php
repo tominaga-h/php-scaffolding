@@ -42,13 +42,14 @@ class AddCommand extends Command
 		}
 
 		$template = Template::fromFile($file);
+		$absPath = SymfonyPath::makeAbsolute($filepath, \getcwd());
 
 		$group = $input->getOption('group') ?? ConfigStorage::DEFAULT_GROUP;
 		if ($configStorage->hasTemplate($template, $group)) {
-			throw new ExistenceException($this->makeExceptionMsg($filepath, $group));
+			throw new ExistenceException($this->makeExceptionMsg($absPath, $group));
 		}
 		$configStorage->addTemplate($template, $group);
-		$output->writeln($this->makeSuccessMsg($filepath, $group));
+		$output->writeln($this->makeSuccessMsg($absPath, $group));
 
 		return Command::SUCCESS;
 	}
