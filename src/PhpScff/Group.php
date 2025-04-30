@@ -9,6 +9,7 @@ use Hytmng\PhpScff\FileSystem\FileSystemInterface;
 use Hytmng\PhpScff\Exception\ExistenceException;
 use Hytmng\PhpScff\Template;
 use Hytmng\PhpScff\Helper\Msg;
+use Hytmng\PhpScff\Helper\Filter;
 
 class Group
 {
@@ -96,9 +97,7 @@ class Group
 		}
 
 		$files = $this->directory->list(false);
-		$filtered = array_filter($files, function (FileSystemInterface $item) {
-			return $item instanceof File;
-		});
+		$filtered = Filter::byFileInstance($files);
 
 		return array_map(function (File $item) {
 			return Template::fromFile($item);
@@ -115,12 +114,9 @@ class Group
 	public function getTemplate(string $name): Template
 	{
 		$templates = $this->getTemplates();
-		$filtered = array_filter($templates, function (Template $template) use ($name) {
-			return $template->getFilename() === $name;
-		});
-
-        if (count($filtered) > 0) {
-            return array_values($filtered)[0];
+		$filtered = Filter::byTemplateName($templates, $name);
+        if (\count($filtered) > 0) {
+            return \array_values($filtered)[0];
         }
         throw new ExistenceException('Template ' . Msg::quote($name) . ' is not exists.');
 	}

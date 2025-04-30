@@ -6,11 +6,11 @@ use Hytmng\PhpScff\Template;
 use Hytmng\PhpScff\Config\PathResolver;
 use Hytmng\PhpScff\FileSystem\File;
 use Hytmng\PhpScff\FileSystem\Directory;
-use Hytmng\PhpScff\FileSystem\Path;
 use Hytmng\PhpScff\FileSystem\FileSystemInterface;
 use Hytmng\PhpScff\Exception\ExistenceException;
 use Hytmng\PhpScff\Group;
 use Hytmng\PhpScff\Helper\Msg;
+use Hytmng\PhpScff\Helper\Filter;
 
 class ConfigStorage
 {
@@ -155,9 +155,7 @@ class ConfigStorage
     public function getTemplate(string $name, ?string $group = null): Template
     {
 		$templates = $this->getTemplates($group);
-		$filtered = \array_filter($templates, function (Template $template) use ($name) {
-			return $template->getFilename() === $name;
-		});
+		$filtered = Filter::byTemplateName($templates, $name);
         if (\count($filtered) > 0) {
             return $filtered[0];
         } else {
@@ -186,9 +184,7 @@ class ConfigStorage
 			$files = $templateDir->list(true); // テンプレートフォルダ内のファイルすべて
 		}
 
-		$filtered = \array_filter($files, function (FileSystemInterface $item) {
-			return $item instanceof File;
-		});
+		$filtered = Filter::byFileInstance($files);
 		return \array_map(function (File $item) {
 			return Template::fromFile($item);
 		}, $filtered);
