@@ -25,7 +25,7 @@ class Filter
 	}
 
 	/**
-	 * Templateインスタンスのみを含む配列を返す
+	 * 名前を指定したテンプレートフィルタリング
 	 *
 	 * @param Template[] $templates
 	 * @param string $name テンプレート名（ファイル名）

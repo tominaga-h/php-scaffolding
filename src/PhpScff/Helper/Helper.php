@@ -6,6 +6,9 @@ use Hytmng\PhpScff\FileSystem\File;
 use Hytmng\PhpScff\FileSystem\Directory;
 use Hytmng\PhpScff\FileSystem\FileSystemInterface;
 
+/**
+ * ヘルパークラス
+ */
 class Helper
 {
 	/**
