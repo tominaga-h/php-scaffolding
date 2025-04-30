@@ -4,6 +4,7 @@ namespace Hytmng\PhpScff\Process;
 
 use Symfony\Component\Process\Process;
 use Hytmng\PhpScff\Exception\ProcessException;
+use Hytmng\PhpScff\Helper\Msg;
 
 class EditProcess
 {
@@ -24,7 +25,7 @@ class EditProcess
 	public function checkEditor(): void
 	{
 		if (!$this->editorExists()) {
-			$msg = 'Editor "' . $this->editor . '" is not found.' . PHP_EOL;
+			$msg = 'Editor ' . Msg::quote($this->editor) . ' is not found.' . PHP_EOL;
 			$msg .= 'Please set your editor to the `EDITOR` environment variable.';
 			throw new ProcessException($msg);
 		}

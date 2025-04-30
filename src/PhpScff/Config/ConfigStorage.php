@@ -10,6 +10,7 @@ use Hytmng\PhpScff\FileSystem\Path;
 use Hytmng\PhpScff\FileSystem\FileSystemInterface;
 use Hytmng\PhpScff\Exception\ExistenceException;
 use Hytmng\PhpScff\Group;
+use Hytmng\PhpScff\Helper\Msg;
 
 class ConfigStorage
 {
@@ -129,7 +130,7 @@ class ConfigStorage
 		$filename = $template->getFilename();
 
         if ($this->hasTemplate($filename, $group)) {
-            throw new ExistenceException('Template "' . $filename . '" is already exists.');
+            throw new ExistenceException('Template ' . Msg::quote($filename) . ' is already exists.');
         }
 
         if (!\is_null($group)) {
@@ -160,7 +161,7 @@ class ConfigStorage
         if (\count($filtered) > 0) {
             return $filtered[0];
         } else {
-            throw new ExistenceException('Template "' . $name . '" is not exists.');
+            throw new ExistenceException('Template ' . Msg::quote($name) . ' is not exists.');
         }
     }
 
@@ -178,7 +179,7 @@ class ConfigStorage
 			$groupDir = $templateDir->getSubDir($group);
 			// グループの存在は必須
 			if (!$groupDir->exists()) {
-				throw new ExistenceException('Group "' . $group . '" is not exists');
+				throw new ExistenceException('Group ' . Msg::quote($group) . ' is not exists');
 			}
 			$files = $groupDir->list(false); // グループ内のファイルのみ
 		} else {
@@ -215,7 +216,7 @@ class ConfigStorage
 
         $templateDir = $this->getTemplateDir();
 		if (!$templateDir->exists()) {
-			throw new ExistenceException('Directory "' . $templateDir->getStringPath() . '" is not exists');
+			throw new ExistenceException('Directory ' . Msg::quote($templateDir->getStringPath()) . ' is not exists');
 		}
         // 指定ディレクトリ内のファイル存在を直接チェック
         return $templateDir->getFile($filename)->exists();

@@ -10,6 +10,7 @@ use Symfony\Component\Filesystem\Filesystem;
 use Hytmng\PhpScff\FileSystem\AbstractFileSystem;
 use Hytmng\PhpScff\FileSystem\Path;
 use Hytmng\PhpScff\Helper\Helper;
+use Hytmng\PhpScff\Helper\Msg;
 use Hytmng\PhpScff\FileSystem\FileSystemInterface;
 use Hytmng\PhpScff\Exception\ExistenceException;
 
@@ -56,7 +57,7 @@ class Directory extends AbstractFileSystem implements IteratorAggregate
 		if (!$this->exists()) {
 			$this->fs->mkdir($this->path->get(), $mode);
 		} else {
-			throw new ExistenceException('Directory "' . $this->path->get() . '" is already exists');
+			throw new ExistenceException('Directory ' . Msg::quote($this->path->get()) . ' is already exists');
 		}
 	}
 
@@ -68,7 +69,7 @@ class Directory extends AbstractFileSystem implements IteratorAggregate
 	public function remove(): void
 	{
 		if (!$this->exists()) {
-			throw new ExistenceException('Directory "' . $this->path->get() . '" is not exists');
+			throw new ExistenceException('Directory ' . Msg::quote($this->path->get()) . ' is not exists');
 		}
 
 		$this->fs->remove($this->path->get());
@@ -84,7 +85,7 @@ class Directory extends AbstractFileSystem implements IteratorAggregate
 	public function list(bool $recursive = false): array
 	{
 		if (!$this->exists()) {
-			throw new ExistenceException('Directory "' . $this->path->get() . '" is not exists');
+			throw new ExistenceException('Directory ' . Msg::quote($this->path->get()) . ' is not exists');
 		}
 
 		if ($recursive) {

@@ -8,6 +8,7 @@ use Hytmng\PhpScff\FileSystem\File;
 use Hytmng\PhpScff\FileSystem\FileSystemInterface;
 use Hytmng\PhpScff\Exception\ExistenceException;
 use Hytmng\PhpScff\Template;
+use Hytmng\PhpScff\Helper\Msg;
 
 class Group
 {
@@ -72,7 +73,7 @@ class Group
 		$filename = $template->getFilename();
 
 		if ($this->hasTemplate($filename)) {
-			throw new ExistenceException('Template "' . $filename . '" is already exists.');
+			throw new ExistenceException('Template ' . Msg::quote($filename) . ' is already exists.');
 		}
 
 		if (!$this->directory->exists()) {
@@ -91,7 +92,7 @@ class Group
 	public function getTemplates(): array
 	{
 		if (!$this->directory->exists()) {
-			throw new ExistenceException('Group "' . $this->getGroupName() . '" is not exists');
+			throw new ExistenceException('Group ' . Msg::quote($this->getGroupName()) . ' is not exists');
 		}
 
 		$files = $this->directory->list(false);
@@ -121,7 +122,7 @@ class Group
         if (count($filtered) > 0) {
             return array_values($filtered)[0];
         }
-        throw new ExistenceException('Template "' . $name . '" is not exists.');
+        throw new ExistenceException('Template ' . Msg::quote($name) . ' is not exists.');
 	}
 
 	/**
