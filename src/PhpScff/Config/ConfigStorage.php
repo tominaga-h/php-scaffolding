@@ -9,6 +9,7 @@ use Hytmng\PhpScff\FileSystem\Directory;
 use Hytmng\PhpScff\FileSystem\Path;
 use Hytmng\PhpScff\FileSystem\FileSystemInterface;
 use Hytmng\PhpScff\Exception\ExistenceException;
+use Hytmng\PhpScff\Group;
 
 class ConfigStorage
 {
@@ -101,8 +102,20 @@ class ConfigStorage
 		$this->getTemplateDir()->remove();
 
 		// 設定フォルダの削除
-		$this->getConfigDir()->remove();
-	}
+        $this->getConfigDir()->remove();
+    }
+
+    /**
+     * グループオブジェクトを取得する
+     *
+     * @param string $group グループ名
+     * @return Group
+     */
+    public function getGroup(string $group): Group
+    {
+        $groupDir = $this->getTemplateDir()->getSubDir($group);
+        return new Group($groupDir);
+    }
 
     /**
      * テンプレートを追加する
@@ -114,19 +127,17 @@ class ConfigStorage
     public function addTemplate(Template $template, ?string $group = null): void
 	{
 		$filename = $template->getFilename();
+
         if ($this->hasTemplate($filename, $group)) {
             throw new ExistenceException('Template "' . $filename . '" is already exists.');
         }
 
-        $templateDir = $this->getTemplateDir();
         if (!\is_null($group)) {
-            $groupDir = $templateDir->getSubDir($group);
-			// グループの存在は任意
-            if (!$groupDir->exists()) {
-                $groupDir->create();
-            }
-            $templateDir = $groupDir;
+            $this->getGroup($group)->addTemplate($template);
+            return;
         }
+
+        $templateDir = $this->getTemplateDir();
         if ($templateDir->exists()) {
             $template->copy($templateDir->getStringPath());
         }
@@ -198,21 +209,16 @@ class ConfigStorage
 			$filename = $template;
 		}
 
-        $templateDir = $this->getTemplateDir();
         if (!\is_null($group)) {
-            $directory = $templateDir->getSubDir($group);
-			// グループの存在は任意
-            if (!$directory->exists()) {
-                return false;
-            }
-        } else {
-            $directory = $templateDir;
-            if (!$directory->exists()) {
-                throw new ExistenceException('Directory "' . $directory->getStringPath() . '" is not exists');
-            }
+            return $this->getGroup($group)->hasTemplate($template);
         }
+
+        $templateDir = $this->getTemplateDir();
+		if (!$templateDir->exists()) {
+			throw new ExistenceException('Directory "' . $templateDir->getStringPath() . '" is not exists');
+		}
         // 指定ディレクトリ内のファイル存在を直接チェック
-        return $directory->getFile($filename)->exists();
+        return $templateDir->getFile($filename)->exists();
 	}
 
 	/**
