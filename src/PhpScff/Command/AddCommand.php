@@ -38,7 +38,7 @@ class AddCommand extends Command
 		$file = File::fromStringPath($filepath);
 
 		if (!$file->exists()) {
-			throw new ExistenceException('File not found: "' . $filepath . '"');
+			throw new ExistenceException('File not found: ' . Msg::quote($filepath));
 		}
 
 		$template = Template::fromFile($file);

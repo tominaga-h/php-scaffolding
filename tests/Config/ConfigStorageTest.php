@@ -454,4 +454,37 @@ class ConfigStorageTest extends TestCase
             $this->assertContains($group, $actualGroups);
         }
     }
+
+    public function testHasGroup(): void
+    {
+        $this->configStorage->create();
+
+        // グループディレクトリを作成
+        $templateDir = $this->configStorage->getTemplateDir();
+        $groupDir = $templateDir->getSubDir('testgroup');
+        $groupDir->create();
+
+        // 存在するグループの確認
+        $this->assertTrue($this->configStorage->hasGroup('testgroup'));
+
+        // 存在しないグループの確認
+        $this->assertFalse($this->configStorage->hasGroup('nonexistent'));
+
+        // 複数のグループを作成して確認
+        $groups = ['group1', 'group2', 'group3'];
+        foreach ($groups as $group) {
+            $groupDir = $templateDir->getSubDir($group);
+            $groupDir->create();
+        }
+
+        foreach ($groups as $group) {
+            $this->assertTrue($this->configStorage->hasGroup($group));
+        }
+
+        // ファイルは含まれないことを確認
+        $filePath = $this->testDir . '/templates/file.txt';
+        $file = File::fromStringPath($filePath);
+        $file->write('content');
+        $this->assertFalse($this->configStorage->hasGroup('file.txt'));
+    }
 }

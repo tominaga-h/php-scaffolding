@@ -204,4 +204,35 @@ class DirectoryTest extends TestCase
 		vfsStream::newFile('test.txt')->at($this->root);
 		$this->assertTrue($file->exists());
 	}
+
+	public function testRename(): void
+	{
+		// テスト用ディレクトリの作成
+		$path = Path::from($this->root->url(), 'olddir');
+		$this->directory = Directory::fromPath($path);
+		vfsStream::newDirectory('olddir')->at($this->root);
+		$this->assertTrue($this->directory->exists());
+
+		// ディレクトリ名の変更
+		$this->directory->rename('newdir');
+
+		// 古いディレクトリが存在しないことを確認
+		$this->assertFalse($this->directory->exists());
+
+		// 新しいディレクトリが存在することを確認
+		$newPath = Path::from($this->root->url(), 'newdir');
+		$newDir = Directory::fromPath($newPath);
+		$this->assertTrue($newDir->exists());
+	}
+
+	public function testRename_throwException(): void
+	{
+		// 存在しないディレクトリのパス
+		$path = Path::from($this->root->url(), 'notfound');
+		$this->directory = Directory::fromPath($path);
+
+		$this->expectException(ExistenceException::class);
+		$this->expectExceptionMessage('Directory "' . $path->get() . '" is not exists');
+		$this->directory->rename('newname');
+	}
 }

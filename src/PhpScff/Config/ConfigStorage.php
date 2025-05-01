@@ -6,9 +6,11 @@ use Hytmng\PhpScff\Template;
 use Hytmng\PhpScff\Config\PathResolver;
 use Hytmng\PhpScff\FileSystem\File;
 use Hytmng\PhpScff\FileSystem\Directory;
-use Hytmng\PhpScff\FileSystem\Path;
 use Hytmng\PhpScff\FileSystem\FileSystemInterface;
 use Hytmng\PhpScff\Exception\ExistenceException;
+use Hytmng\PhpScff\Group;
+use Hytmng\PhpScff\Helper\Msg;
+use Hytmng\PhpScff\Helper\Filter;
 
 class ConfigStorage
 {
@@ -101,8 +103,8 @@ class ConfigStorage
 		$this->getTemplateDir()->remove();
 
 		// 設定フォルダの削除
-		$this->getConfigDir()->remove();
-	}
+        $this->getConfigDir()->remove();
+    }
 
     /**
      * テンプレートを追加する
@@ -114,19 +116,17 @@ class ConfigStorage
     public function addTemplate(Template $template, ?string $group = null): void
 	{
 		$filename = $template->getFilename();
+
         if ($this->hasTemplate($filename, $group)) {
-            throw new ExistenceException('Template "' . $filename . '" is already exists.');
+            throw new ExistenceException('Template ' . Msg::quote($filename) . ' is already exists.');
+        }
+
+        if (!\is_null($group)) {
+            $this->getGroup($group)->addTemplate($template);
+            return;
         }
 
         $templateDir = $this->getTemplateDir();
-        if (!\is_null($group)) {
-            $groupDir = $templateDir->getSubDir($group);
-			// グループの存在は任意
-            if (!$groupDir->exists()) {
-                $groupDir->create();
-            }
-            $templateDir = $groupDir;
-        }
         if ($templateDir->exists()) {
             $template->copy($templateDir->getStringPath());
         }
@@ -143,13 +143,11 @@ class ConfigStorage
     public function getTemplate(string $name, ?string $group = null): Template
     {
 		$templates = $this->getTemplates($group);
-		$filtered = \array_filter($templates, function (Template $template) use ($name) {
-			return $template->getFilename() === $name;
-		});
+		$filtered = Filter::byTemplateName($templates, $name);
         if (\count($filtered) > 0) {
             return $filtered[0];
         } else {
-            throw new ExistenceException('Template "' . $name . '" is not exists.');
+            throw new ExistenceException('Template ' . Msg::quote($name) . ' is not exists.');
         }
     }
 
@@ -167,16 +165,14 @@ class ConfigStorage
 			$groupDir = $templateDir->getSubDir($group);
 			// グループの存在は必須
 			if (!$groupDir->exists()) {
-				throw new ExistenceException('Group "' . $group . '" is not exists');
+				throw new ExistenceException('Group ' . Msg::quote($group) . ' is not exists');
 			}
 			$files = $groupDir->list(false); // グループ内のファイルのみ
 		} else {
 			$files = $templateDir->list(true); // テンプレートフォルダ内のファイルすべて
 		}
 
-		$filtered = \array_filter($files, function (FileSystemInterface $item) {
-			return $item instanceof File;
-		});
+		$filtered = Filter::byFileInstance($files);
 		return \array_map(function (File $item) {
 			return Template::fromFile($item);
 		}, $filtered);
@@ -198,21 +194,57 @@ class ConfigStorage
 			$filename = $template;
 		}
 
-        $templateDir = $this->getTemplateDir();
         if (!\is_null($group)) {
-            $directory = $templateDir->getSubDir($group);
-			// グループの存在は任意
-            if (!$directory->exists()) {
-                return false;
-            }
-        } else {
-            $directory = $templateDir;
-            if (!$directory->exists()) {
-                throw new ExistenceException('Directory "' . $directory->getStringPath() . '" is not exists');
-            }
+            return $this->getGroup($group)->hasTemplate($template);
         }
+
+        $templateDir = $this->getTemplateDir();
+		if (!$templateDir->exists()) {
+			throw new ExistenceException('Directory ' . Msg::quote($templateDir->getStringPath()) . ' is not exists');
+		}
         // 指定ディレクトリ内のファイル存在を直接チェック
-        return $directory->getFile($filename)->exists();
+        return $templateDir->getFile($filename)->exists();
+	}
+
+    /**
+     * グループオブジェクトを取得する
+     *
+     * @param string $group グループ名
+     * @return Group
+     */
+    public function getGroup(string $group): Group
+    {
+        $groupDir = $this->getTemplateDir()->getSubDir($group);
+        return new Group($groupDir);
+    }
+
+	/**
+	 * 全てのグループ名を取得する
+	 *
+	 * @return string[] グループ名の配列
+	 */
+	public function getGroups(): array
+	{
+		$items = $this->getTemplateDir()->list(false);
+		$groups = [];
+		foreach ($items as $item) {
+			if ($item instanceof Directory) {
+				$groups[] = $item->getDirName();
+			}
+		}
+		return $groups;
+	}
+
+	/**
+	 * グループが存在するかどうかを確認する
+	 *
+	 * @param string $group グループ名
+	 * @return bool
+	 */
+	public function hasGroup(string $group): bool
+	{
+		$groups = $this->getGroups();
+		return \in_array($group, $groups);
 	}
 
 	/**
@@ -231,23 +263,6 @@ class ConfigStorage
 				if (!empty($templates)) {
 					$groups[$groupName] = $templates;
 				}
-			}
-		}
-		return $groups;
-	}
-
-	/**
-	 * 全てのグループ名を取得する
-	 *
-	 * @return string[] グループ名の配列
-	 */
-	public function getGroups(): array
-	{
-		$items = $this->getTemplateDir()->list(false);
-		$groups = [];
-		foreach ($items as $item) {
-			if ($item instanceof Directory) {
-				$groups[] = $item->getDirName();
 			}
 		}
 		return $groups;

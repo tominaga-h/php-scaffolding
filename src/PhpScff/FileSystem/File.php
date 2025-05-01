@@ -7,6 +7,7 @@ use Symfony\Component\Filesystem\Filesystem;
 use Hytmng\PhpScff\FileSystem\AbstractFileSystem;
 use Hytmng\PhpScff\FileSystem\Path;
 use Hytmng\PhpScff\Exception\ExistenceException;
+use Hytmng\PhpScff\Helper\Msg;
 
 class File extends AbstractFileSystem
 {
@@ -64,7 +65,7 @@ class File extends AbstractFileSystem
 		) {
 			$this->fs->dumpFile($this->path->get(), $content);
 		} else {
-			throw new ExistenceException('File "' . $this->path->get() . '" is already exists');
+			throw new ExistenceException('File ' . Msg::quote($this->path->get()) . ' is already exists');
 		}
 	}
 

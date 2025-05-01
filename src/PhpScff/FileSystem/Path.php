@@ -47,8 +47,39 @@ class Path
 		return new self($path);
 	}
 
+	/**
+	 * 現在のパスのbasenameを返す
+	 *
+	 * @return string
+	 */
 	public function basename(): string
 	{
 		return \basename($this->path);
+	}
+
+	/**
+	 * 現在のパスのdirnameを返す
+	 *
+	 * @return string
+	 */
+	public function dirname(): string
+	{
+		return \dirname($this->path);
+	}
+
+	/**
+	 * 親ディレクトリのパスに新しいパスを結合したパスを返す
+	 *
+	 * 例：
+	 * `path/to/here` というパスの場合 `$path->replace('file')` を実行すると、
+	 * `path/to/file` というパス（Pathオブジェクト）を返す
+	 *
+	 * @param string $path 新しいパス
+	 * @return Path
+	 */
+	public function replace(string $path): self
+	{
+		$dirname = $this->dirname();
+		return self::from($dirname, $path);
 	}
 }

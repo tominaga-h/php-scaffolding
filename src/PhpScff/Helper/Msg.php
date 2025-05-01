@@ -2,8 +2,9 @@
 
 namespace Hytmng\PhpScff\Helper;
 
-use Symfony\Component\Filesystem\Path as SymfonyPath;
-
+/**
+ * メッセージ作成に関するメソッドを集約したヘルパークラス
+ */
 class Msg
 {
 	public const FLG_NOT_FOUND = 0;
