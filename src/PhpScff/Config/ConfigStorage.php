@@ -107,18 +107,6 @@ class ConfigStorage
     }
 
     /**
-     * グループオブジェクトを取得する
-     *
-     * @param string $group グループ名
-     * @return Group
-     */
-    public function getGroup(string $group): Group
-    {
-        $groupDir = $this->getTemplateDir()->getSubDir($group);
-        return new Group($groupDir);
-    }
-
-    /**
      * テンプレートを追加する
      *
      * @param Template   $template テンプレートオブジェクト
@@ -218,6 +206,47 @@ class ConfigStorage
         return $templateDir->getFile($filename)->exists();
 	}
 
+    /**
+     * グループオブジェクトを取得する
+     *
+     * @param string $group グループ名
+     * @return Group
+     */
+    public function getGroup(string $group): Group
+    {
+        $groupDir = $this->getTemplateDir()->getSubDir($group);
+        return new Group($groupDir);
+    }
+
+	/**
+	 * 全てのグループ名を取得する
+	 *
+	 * @return string[] グループ名の配列
+	 */
+	public function getGroups(): array
+	{
+		$items = $this->getTemplateDir()->list(false);
+		$groups = [];
+		foreach ($items as $item) {
+			if ($item instanceof Directory) {
+				$groups[] = $item->getDirName();
+			}
+		}
+		return $groups;
+	}
+
+	/**
+	 * グループが存在するかどうかを確認する
+	 *
+	 * @param string $group グループ名
+	 * @return bool
+	 */
+	public function hasGroup(string $group): bool
+	{
+		$groups = $this->getGroups();
+		return \in_array($group, $groups);
+	}
+
 	/**
 	 * 全てのグループとそのテンプレートの一覧を取得する
 	 *
@@ -234,23 +263,6 @@ class ConfigStorage
 				if (!empty($templates)) {
 					$groups[$groupName] = $templates;
 				}
-			}
-		}
-		return $groups;
-	}
-
-	/**
-	 * 全てのグループ名を取得する
-	 *
-	 * @return string[] グループ名の配列
-	 */
-	public function getGroups(): array
-	{
-		$items = $this->getTemplateDir()->list(false);
-		$groups = [];
-		foreach ($items as $item) {
-			if ($item instanceof Directory) {
-				$groups[] = $item->getDirName();
 			}
 		}
 		return $groups;

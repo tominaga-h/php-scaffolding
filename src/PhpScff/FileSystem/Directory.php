@@ -76,6 +76,22 @@ class Directory extends AbstractFileSystem implements IteratorAggregate
 	}
 
 	/**
+	 * ディレクトリ名を変更する
+	 *
+	 * @param string $newname
+	 * @throws ExistenceException
+	 */
+	public function rename(string $newname): void
+	{
+		if (!$this->exists()) {
+			throw new ExistenceException('Directory ' . Msg::quote($this->path->get()) . ' is not exists');
+		}
+
+		$newPath = $this->path->replace($newname);
+		$this->fs->rename($this->path->get(), $newPath->get());
+	}
+
+	/**
 	 * ディレクトリの内容をオブジェクトにした配列を返す
 	 *
 	 * @param bool $recursive trueにすると再帰的にディレクトリの内容を取得する

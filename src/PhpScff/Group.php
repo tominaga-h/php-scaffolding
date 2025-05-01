@@ -64,6 +64,17 @@ class Group
 	}
 
 	/**
+	 * グループ名を変更する
+	 *
+	 * @param string $newname
+	 * @throws ExistenceException
+	 */
+	public function rename(string $newname): void
+	{
+		$this->directory->rename($newname);
+	}
+
+	/**
 	 * テンプレートを追加する
 	 *
 	 * @param Template $template
