@@ -20,7 +20,7 @@ class GroupsCommand extends Command
 		$this
 			->setName('groups')
 			->setDescription('List all existing groups')
-			->addOption('templates', 't', InputOption::VALUE_NONE, 'List groups with templates');
+			->addOption('with-templates', 't', InputOption::VALUE_NONE, 'List groups with templates');
 	}
 
 	protected function execute(InputInterface $input, OutputInterface $output): int
@@ -30,9 +30,9 @@ class GroupsCommand extends Command
 			return Command::FAILURE;
 		}
 		$configStorage = $app->getConfigStorage();
-		$isTemplates = $input->getOption('templates');
+		$WithTemplates = $input->getOption('with-templates');
 
-		if ($isTemplates) {
+		if ($WithTemplates) {
 			$groups = $configStorage->getTemplatesByGroup();
 			$this->outputGroups($output, $groups, true);
 		} else {
