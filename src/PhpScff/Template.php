@@ -14,6 +14,7 @@ class Template
 
 	private File $file;
 	private Filesystem $filesystem;
+	private ?EditProcess $editProcess = null;
 
 	public function __construct(File $file, Filesystem $filesystem)
 	{
@@ -79,13 +80,23 @@ class Template
 	}
 
 	/**
+	 * EditProcessを設定する
+	 *
+	 * @param EditProcess $editProcess
+	 */
+	public function setEditProcess(EditProcess $editProcess): void
+	{
+		$this->editProcess = $editProcess;
+	}
+
+	/**
 	 * テンプレートを編集する
 	 *
 	 * @return bool 編集が成功した場合は true, 失敗した場合は false
 	 */
 	public function edit(): bool
 	{
-		$editor = new EditProcess();
+		$editor = $this->editProcess ?? new EditProcess();
 		return $editor->edit($this->path->get());
 	}
 }
