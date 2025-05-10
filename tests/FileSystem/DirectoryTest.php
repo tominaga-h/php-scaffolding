@@ -240,7 +240,9 @@ class DirectoryTest extends TestCase
 		$this->directory->rename('newdir');
 
 		// 古いディレクトリが存在しないことを確認
-		$this->assertFalse($this->directory->exists());
+		$oldPath = Path::from($this->root->url(), 'olddir');
+		$oldDir = Directory::fromPath($oldPath);
+		$this->assertFalse($oldDir->exists());
 
 		// 新しいディレクトリが存在することを確認
 		$newPath = Path::from($this->root->url(), 'newdir');

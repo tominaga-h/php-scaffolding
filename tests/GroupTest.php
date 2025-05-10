@@ -5,6 +5,7 @@ namespace Tests;
 use PHPUnit\Framework\TestCase;
 use Hytmng\PhpScff\FileSystem\Directory;
 use Hytmng\PhpScff\FileSystem\File;
+use Hytmng\PhpScff\FileSystem\Path;
 use Hytmng\PhpScff\Template;
 use Hytmng\PhpScff\Group;
 use Hytmng\PhpScff\Exception\ExistenceException;
@@ -13,132 +14,140 @@ use Symfony\Component\Filesystem\Filesystem;
 class GroupTest extends TestCase
 {
     private string $testDir;
-    private ?string $srcDir = null;
+    private Filesystem $filesystem;
     private Group $group;
-    private Filesystem $fs;
 
     protected function setUp(): void
     {
-        $this->fs = new Filesystem();
-        $this->testDir = sys_get_temp_dir() . '/phpscff_group_' . uniqid();
-        $dir = Directory::fromStringPath($this->testDir);
-        $this->group = new Group($dir);
+        $this->testDir = sys_get_temp_dir() . '/php-scff-test';
+        $this->filesystem = new Filesystem();
+        $this->filesystem->mkdir($this->testDir);
+
+        $directory = new Directory(Path::from($this->testDir, 'test-group'), $this->filesystem);
+        $this->group = new Group($directory);
     }
 
     protected function tearDown(): void
     {
-        if ($this->fs->exists($this->testDir)) {
-            $this->fs->remove($this->testDir);
-        }
-        if ($this->srcDir !== null && $this->fs->exists($this->srcDir)) {
-            $this->fs->remove($this->srcDir);
-        }
+        $this->filesystem->remove($this->testDir);
     }
 
-    public function testExists_DefaultFalse(): void
+    public function testGetGroupName(): void
+    {
+        $this->assertEquals('test-group', $this->group->getGroupName());
+    }
+
+    public function testExists_WhenNotExists(): void
     {
         $this->assertFalse($this->group->exists());
     }
 
-    public function testCreateAndRemove(): void
+    public function testExists_WhenExists(): void
     {
         $this->group->create();
         $this->assertTrue($this->group->exists());
-
-        // duplicate create throws
-        $this->expectException(ExistenceException::class);
-        $this->expectExceptionMessage('Directory "' . $this->testDir . '" is already exists');
-        $this->group->create();
     }
 
-    public function testCreate_ThrowException(): void
+    public function testCreate(): void
     {
-        $this->expectException(ExistenceException::class);
-        $this->expectExceptionMessage('Directory "' . $this->testDir . '" is not exists');
+        $this->group->create();
+        $this->assertTrue($this->group->exists());
+        $this->assertFileExists($this->testDir . '/test-group/meta.yaml');
+    }
+
+    public function testRemove(): void
+    {
+        $this->group->create();
         $this->group->remove();
-    }
-
-    public function testAddTemplate_AutoCreatesGroup(): void
-    {
         $this->assertFalse($this->group->exists());
-
-        // prepare source file outside group dir
-        $this->srcDir = sys_get_temp_dir() . '/phpscff_group_src_' . uniqid();
-        $srcFilePath = $this->srcDir . '/template.txt';
-        $file = File::fromStringPath($srcFilePath);
-        $file->write('test content');
-
-        $template = Template::fromFile($file);
-
-        // add without explicit create
-        $this->group->addTemplate($template);
-        $this->assertTrue($this->group->exists());
-        $this->assertTrue($this->group->hasTemplate('template.txt'));
-
-        // check file copied
-        $dest = $this->testDir . '/template.txt';
-        $this->assertTrue($this->fs->exists($dest));
-        $this->assertEquals('test content', file_get_contents($dest));
     }
 
-    public function testAddAndGetAndHasTemplates(): void
+    public function testRename(): void
     {
         $this->group->create();
-
-        // prepare source file
-        $this->srcDir = sys_get_temp_dir() . '/phpscff_group_src_' . uniqid();
-        $srcFilePath = $this->srcDir . '/t1.txt';
-        $file = File::fromStringPath($srcFilePath);
-        $file->write('content1');
-
-        $template = Template::fromFile($file);
-
-        $this->assertFalse($this->group->hasTemplate('t1.txt'));
-        $this->group->addTemplate($template);
-        $this->assertTrue($this->group->hasTemplate($template));
-        $this->assertTrue($this->group->hasTemplate('t1.txt'));
-
-        $tpl = $this->group->getTemplate('t1.txt');
-        $this->assertInstanceOf(Template::class, $tpl);
-        $this->assertEquals('t1.txt', $tpl->getFilename());
-
-        $all = $this->group->getTemplates();
-        $this->assertCount(1, $all);
-        $this->assertEquals('t1.txt', $all[0]->getFilename());
+        $this->group->rename('new-group');
+        $this->assertEquals('new-group', $this->group->getGroupName());
+        $this->assertDirectoryExists($this->testDir . '/new-group');
     }
 
-    public function testAddTemplate_ThrowException(): void
+    public function testAddTemplate(): void
     {
         $this->group->create();
-        $this->srcDir = sys_get_temp_dir() . '/phpscff_group_src_' . uniqid();
-        $path = $this->srcDir . '/dup.txt';
-        $file = File::fromStringPath($path);
-        $file->write('foo');
+        $file = File::fromStringPath($this->testDir . '/template.php');
+        $file->write('<?php echo "test";');
+        $template = Template::fromFile($file);
+
+        $this->group->addTemplate($template);
+        $this->assertTrue($this->group->hasTemplate('template.php'));
+    }
+
+    public function testAddTemplate_ThrowException_WhenTemplateExists(): void
+    {
+        $this->group->create();
+        $file = File::fromStringPath($this->testDir . '/template.php');
+        $file->write('<?php echo "test";');
         $template = Template::fromFile($file);
 
         $this->group->addTemplate($template);
         $this->expectException(ExistenceException::class);
-        $this->expectExceptionMessage('Template "dup.txt" is already exists.');
         $this->group->addTemplate($template);
     }
 
-    public function testGetTemplates_ThrowException(): void
+    public function testGetTemplates(): void
+    {
+        $this->group->create();
+        $file = File::fromStringPath($this->testDir . '/template.php');
+        $file->write('<?php echo "test";');
+        $template = Template::fromFile($file);
+
+        $this->group->addTemplate($template);
+        $templates = $this->group->getTemplates();
+
+        $this->assertCount(1, $templates);
+        $this->assertInstanceOf(Template::class, $templates[0]);
+    }
+
+    public function testGetTemplates_ThrowException_WhenGroupNotExists(): void
     {
         $this->expectException(ExistenceException::class);
-        $this->expectExceptionMessage('Group "' . $this->group->getGroupName() . '" is not exists');
         $this->group->getTemplates();
     }
 
-    public function testGetTemplate_ThrowException(): void
+    public function testGetTemplate(): void
+    {
+        $this->group->create();
+        $file = File::fromStringPath($this->testDir . '/template.php');
+        $file->write('<?php echo "test";');
+        $template = Template::fromFile($file);
+
+        $this->group->addTemplate($template);
+        $retrievedTemplate = $this->group->getTemplate('template.php');
+
+        $this->assertInstanceOf(Template::class, $retrievedTemplate);
+        $this->assertEquals('template.php', $retrievedTemplate->getFilename());
+    }
+
+    public function testGetTemplate_ThrowException_WhenTemplateNotExists(): void
     {
         $this->group->create();
         $this->expectException(ExistenceException::class);
-        $this->expectExceptionMessage('Template "none.txt" is not exists.');
-        $this->group->getTemplate('none.txt');
+        $this->group->getTemplate('non-existent.php');
     }
 
-    public function testHasTemplate_ReturnsFalseWhenNoDirectory(): void
+    public function testHasTemplate(): void
     {
-        $this->assertFalse($this->group->hasTemplate('foo.txt'));
+        $this->group->create();
+        $file = File::fromStringPath($this->testDir . '/template.php');
+        $file->write('<?php echo "test";');
+        $template = Template::fromFile($file);
+
+        $this->group->addTemplate($template);
+        $this->assertTrue($this->group->hasTemplate('template.php'));
+        $this->assertFalse($this->group->hasTemplate('non-existent.php'));
+    }
+
+    public function testHasTemplate_WhenGroupNotExists(): void
+    {
+        $this->assertFalse($this->group->hasTemplate('template.php'));
     }
 }

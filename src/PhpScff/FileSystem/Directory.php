@@ -89,6 +89,7 @@ class Directory extends AbstractFileSystem implements IteratorAggregate
 
 		$newPath = $this->path->replace($newname);
 		$this->fs->rename($this->path->get(), $newPath->get());
+		$this->path = $newPath;
 	}
 
 	/**

@@ -51,6 +51,7 @@ class Group
 	public function create(): void
 	{
 		$this->directory->create();
+		$this->putMetaYaml();
 	}
 
 	/**
@@ -72,6 +73,8 @@ class Group
 	public function rename(string $newname): void
 	{
 		$this->directory->rename($newname);
+		$this->path = $this->directory->getPath();
+		$this->directory = Directory::fromPath($this->path);
 	}
 
 	/**
@@ -110,6 +113,9 @@ class Group
 
 		$files = $this->directory->list(false);
 		$filtered = Filter::byFileInstance($files);
+		$filtered = array_filter($filtered, function (File $file) {
+			return $file->getFilename() !== 'meta.yaml';
+		});
 
 		return array_map(function (File $item) {
 			return Template::fromFile($item);
