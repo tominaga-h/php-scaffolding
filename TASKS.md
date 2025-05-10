@@ -21,7 +21,7 @@
 
 - [x] `add` コマンドの実装
 - [x] `edit` コマンドの実装
-- [ ] `group` コマンドの実装
+- [x] `group` コマンドの実装
 - [ ] `new` コマンドの実装
 
 ## TREE STRUCTURE
