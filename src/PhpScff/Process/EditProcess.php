@@ -69,6 +69,7 @@ class EditProcess
 		$command[] = $path;
 		$proc = $this->createProcess($command);
 		$proc->setTty(true);
+		$proc->setTimeout(null);
 		$proc->run();
 		return $proc->isSuccessful();
 	}
