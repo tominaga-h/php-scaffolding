@@ -44,7 +44,7 @@ class EditProcessTest extends TestCase
         }
     }
 
-    public function testConstructWithValidEditor(): void
+    public function testConstruct_WithValidEditor(): void
     {
         $_SERVER['EDITOR'] = 'vim';
 
@@ -58,7 +58,7 @@ class EditProcessTest extends TestCase
         $this->assertInstanceOf(EditProcess::class, $this->editProcess);
     }
 
-    public function testConstructWithInvalidEditor(): void
+    public function testConstruct_WithInvalidEditor(): void
     {
         $_SERVER['EDITOR'] = 'non_existent_editor';
 
@@ -74,7 +74,7 @@ class EditProcessTest extends TestCase
         $this->editProcess->__construct();
     }
 
-    public function testConstructWithoutEditor(): void
+    public function testConstruct_WithoutEditor(): void
     {
         unset($_SERVER['EDITOR']);
 

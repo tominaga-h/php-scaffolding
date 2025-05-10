@@ -78,6 +78,20 @@ class DirectoryTest extends TestCase
 		$this->directory->create();
 	}
 
+	public function testCreate_ThrowException()
+	{
+		$path = Path::from($this->root->url(), 'testdir');
+		$this->directory = Directory::fromPath($path);
+		$this->assertFalse($this->directory->exists());
+
+		$this->directory->create();
+		$this->assertTrue($this->directory->exists());
+
+		$this->expectException(ExistenceException::class);
+		$this->expectExceptionMessage('Directory "' . $path->get() . '" is already exists');
+		$this->directory->create();
+	}
+
 	public function testRemove()
 	{
 		$path = Path::from($this->root->url(), 'testdir');
@@ -88,6 +102,15 @@ class DirectoryTest extends TestCase
 		$this->directory->remove();
 		$this->assertFalse($this->directory->exists());
 
+		$this->expectException(ExistenceException::class);
+		$this->expectExceptionMessage('Directory "' . $path->get() . '" is not exists');
+		$this->directory->remove();
+	}
+
+	public function testRemove_ThrowException()
+	{
+		$path = Path::from($this->root->url(), 'testdir');
+		$this->directory = Directory::fromPath($path);
 		$this->expectException(ExistenceException::class);
 		$this->expectExceptionMessage('Directory "' . $path->get() . '" is not exists');
 		$this->directory->remove();
@@ -127,7 +150,7 @@ class DirectoryTest extends TestCase
 		$this->assertEquals($list[1]->getStringPath(), $this->root->url() . '/subdir1/file3.txt');
 	}
 
-	public function testList_throwException()
+	public function testList_ThrowException()
 	{
 		$path = Path::from($this->root->url(), 'notfound');
 		$this->directory = Directory::fromPath($path);
@@ -225,7 +248,7 @@ class DirectoryTest extends TestCase
 		$this->assertTrue($newDir->exists());
 	}
 
-	public function testRename_throwException(): void
+	public function testRename_ThrowException(): void
 	{
 		// 存在しないディレクトリのパス
 		$path = Path::from($this->root->url(), 'notfound');

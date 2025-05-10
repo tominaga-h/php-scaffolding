@@ -35,7 +35,7 @@ class GroupTest extends TestCase
         }
     }
 
-    public function testExistsDefaultFalse(): void
+    public function testExists_DefaultFalse(): void
     {
         $this->assertFalse($this->group->exists());
     }
@@ -51,14 +51,14 @@ class GroupTest extends TestCase
         $this->group->create();
     }
 
-    public function testRemoveThrowsWhenNotExists(): void
+    public function testCreate_ThrowException(): void
     {
         $this->expectException(ExistenceException::class);
         $this->expectExceptionMessage('Directory "' . $this->testDir . '" is not exists');
         $this->group->remove();
     }
 
-    public function testAddTemplateAutoCreatesGroup(): void
+    public function testAddTemplate_AutoCreatesGroup(): void
     {
         $this->assertFalse($this->group->exists());
 
@@ -107,7 +107,7 @@ class GroupTest extends TestCase
         $this->assertEquals('t1.txt', $all[0]->getFilename());
     }
 
-    public function testAddDuplicateTemplateThrows(): void
+    public function testAddTemplate_ThrowException(): void
     {
         $this->group->create();
         $this->srcDir = sys_get_temp_dir() . '/phpscff_group_src_' . uniqid();
@@ -122,14 +122,14 @@ class GroupTest extends TestCase
         $this->group->addTemplate($template);
     }
 
-    public function testGetTemplatesThrowsWhenGroupNotExists(): void
+    public function testGetTemplates_ThrowException(): void
     {
         $this->expectException(ExistenceException::class);
         $this->expectExceptionMessage('Group "' . $this->group->getGroupName() . '" is not exists');
         $this->group->getTemplates();
     }
 
-    public function testGetTemplateThrowsWhenTemplateNotExists(): void
+    public function testGetTemplate_ThrowException(): void
     {
         $this->group->create();
         $this->expectException(ExistenceException::class);
@@ -137,7 +137,7 @@ class GroupTest extends TestCase
         $this->group->getTemplate('none.txt');
     }
 
-    public function testHasTemplateReturnsFalseWhenNoDirectory(): void
+    public function testHasTemplate_ReturnsFalseWhenNoDirectory(): void
     {
         $this->assertFalse($this->group->hasTemplate('foo.txt'));
     }

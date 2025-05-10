@@ -63,7 +63,7 @@ class ConfigStorageTest extends TestCase
         $this->assertTrue($this->filesystem->exists($this->testDir . '/.phpscff/templates'));
     }
 
-    public function testCreateThrowsExceptionWhenAlreadyExists(): void
+    public function testCreate_ThrowException(): void
     {
         $this->configStorage->create();
         $this->expectException(ExistenceException::class);
@@ -77,7 +77,7 @@ class ConfigStorageTest extends TestCase
         $this->assertFalse($this->filesystem->exists($this->testDir . '/.phpscff'));
     }
 
-    public function testRemoveThrowsExceptionWhenNotExists(): void
+    public function testRemove_ThrowException(): void
     {
         $this->expectException(ExistenceException::class);
         $this->configStorage->remove();
@@ -94,7 +94,7 @@ class ConfigStorageTest extends TestCase
         $this->assertTrue($this->filesystem->exists($this->testDir . '/.phpscff/templates/test_template.txt'));
     }
 
-    public function testAddTemplateThrowsExceptionWhenAlreadyExists(): void
+    public function testAddTemplate_ThrowException(): void
     {
         $this->configStorage->create();
         $templateFile = File::fromStringPath($this->testDir . '/test_template.txt');
@@ -119,7 +119,7 @@ class ConfigStorageTest extends TestCase
         $this->assertEquals('test_template.txt', $retrievedTemplate->getFilename());
     }
 
-    public function testGetTemplateThrowsExceptionWhenNotExists(): void
+    public function testGetTemplate_ThrowException(): void
     {
         $this->configStorage->create();
         $this->expectException(ExistenceException::class);
