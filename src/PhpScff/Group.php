@@ -5,11 +5,11 @@ namespace Hytmng\PhpScff;
 use Hytmng\PhpScff\FileSystem\PathTrait;
 use Hytmng\PhpScff\FileSystem\Directory;
 use Hytmng\PhpScff\FileSystem\File;
-use Hytmng\PhpScff\FileSystem\FileSystemInterface;
 use Hytmng\PhpScff\Exception\ExistenceException;
 use Hytmng\PhpScff\Template;
 use Hytmng\PhpScff\Helper\Msg;
 use Hytmng\PhpScff\Helper\Filter;
+use Hytmng\PhpScff\Service\TwigService;
 
 class Group
 {
@@ -45,12 +45,14 @@ class Group
 
 	/**
 	 * グループディレクトリを作成する
+	 * 同時に `meta.yaml` を配下に作成する
 	 *
 	 * @throws ExistenceException
 	 */
 	public function create(): void
 	{
 		$this->directory->create();
+		$this->putMetaYaml();
 	}
 
 	/**
@@ -152,4 +154,16 @@ class Group
 
 		return $this->directory->getFile($filename)->exists();
 	}
+
+	/**
+	 * グループディレクトリ配下に`meta.yaml` を作成する
+	 */
+	protected function putMetaYaml(): void
+	{
+		$path = $this->path->join('meta.yaml');
+		$file = File::fromPath($path);
+		$content = TwigService::renderMetaYaml($this->getGroupName());
+		$file->write($content);
+	}
+
 }
