@@ -23,3 +23,10 @@
 - [x] `edit` コマンドの実装
 - [ ] `group` コマンドの実装
 - [ ] `new` コマンドの実装
+
+## TREE STRUCTURE
+
+- [x] ツリー構造で使うクラスの設計
+- [x] 実装: StructureParser
+- [x] 実装: TreeEntry
+- [x] 実装: TreeNode
