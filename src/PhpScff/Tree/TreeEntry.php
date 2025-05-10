@@ -19,6 +19,7 @@ class TreeEntry
 	public function __construct(Directory $directory)
 	{
 		$this->directory = $directory;
+		$this->nodes = [];
 	}
 
 	/**

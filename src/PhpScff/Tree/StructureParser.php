@@ -5,7 +5,6 @@ namespace Hytmng\PhpScff\Tree;
 use Hytmng\PhpScff\Tree\TreeEntry;
 use Hytmng\PhpScff\Tree\TreeNode;
 use Hytmng\PhpScff\FileSystem\Directory;
-use Hytmng\PhpScff\FileSystem\File;
 use Hytmng\PhpScff\FileSystem\Path;
 
 class StructureParser
