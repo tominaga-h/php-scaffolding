@@ -11,12 +11,12 @@ use Hytmng\PhpScff\Application;
 use Hytmng\PhpScff\Helper\Msg;
 use Hytmng\PhpScff\Config\ConfigStorage;
 
-class RenameGroupCommand extends Command
+class GroupRenameCommand extends Command
 {
 	protected function configure(): void
 	{
 		$this
-			->setName('rename:group')
+			->setName('group:rename')
 			->setDescription('Rename a group')
 			->addArgument('oldname', InputArgument::REQUIRED, 'Old name of the group')
 			->addArgument('newname', InputArgument::REQUIRED, 'New name of the group');
