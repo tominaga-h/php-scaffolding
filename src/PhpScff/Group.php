@@ -45,14 +45,12 @@ class Group
 
 	/**
 	 * グループディレクトリを作成する
-	 * 同時に `meta.yaml` を配下に作成する
 	 *
 	 * @throws ExistenceException
 	 */
 	public function create(): void
 	{
 		$this->directory->create();
-		$this->putMetaYaml();
 	}
 
 	/**
@@ -92,6 +90,7 @@ class Group
 
 		if (!$this->directory->exists()) {
 			$this->directory->create();
+			$this->putMetaYaml();
 		}
 
 		$template->copy($this->directory->getStringPath());
