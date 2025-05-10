@@ -158,4 +158,103 @@ class ConfigStorageTest extends TestCase
         $this->assertTrue($this->configStorage->hasGroup('group1'));
         $this->assertFalse($this->configStorage->hasGroup('non_existent'));
     }
+
+    public function testSetPathResolver(): void
+    {
+        $newPath = $this->testDir . '/new_path';
+        $newResolver = new \Hytmng\PhpScff\Config\PathResolver($newPath, '.phpscff');
+        $this->configStorage->setPathResolver($newResolver);
+
+        $configDir = $this->configStorage->getConfigDir();
+        $this->assertEquals($newPath, $configDir->getStringPath());
+    }
+
+    public function testGetTemplates_WithGroup(): void
+    {
+        $this->configStorage->create();
+        $this->filesystem->mkdir($this->testDir . '/.phpscff/templates/group1');
+
+        $templateFile = File::fromStringPath($this->testDir . '/test_template.txt');
+        $templateFile->write('test content');
+        $template = Template::fromFile($templateFile);
+
+        $this->configStorage->addTemplate($template, 'group1');
+
+        $templates = $this->configStorage->getTemplates('group1');
+        $this->assertCount(1, $templates);
+        $this->assertEquals('test_template.txt', $templates[0]->getFilename());
+    }
+
+    public function testGetTemplates_WithNonExistentGroup(): void
+    {
+        $this->configStorage->create();
+        $this->expectException(ExistenceException::class);
+        $this->configStorage->getTemplates('non_existent');
+    }
+
+    public function testGetTemplatesByGroup(): void
+    {
+        $this->configStorage->create();
+        $this->filesystem->mkdir($this->testDir . '/.phpscff/templates/group1');
+        $this->filesystem->mkdir($this->testDir . '/.phpscff/templates/group2');
+
+        $templateFile1 = File::fromStringPath($this->testDir . '/test_template1.txt');
+        $templateFile1->write('test content 1');
+        $template1 = Template::fromFile($templateFile1);
+
+        $templateFile2 = File::fromStringPath($this->testDir . '/test_template2.txt');
+        $templateFile2->write('test content 2');
+        $template2 = Template::fromFile($templateFile2);
+
+        $this->configStorage->addTemplate($template1, 'group1');
+        $this->configStorage->addTemplate($template2, 'group2');
+
+        $templatesByGroup = $this->configStorage->getTemplatesByGroup();
+        $this->assertCount(2, $templatesByGroup);
+        $this->assertArrayHasKey('group1', $templatesByGroup);
+        $this->assertArrayHasKey('group2', $templatesByGroup);
+        $this->assertCount(1, $templatesByGroup['group1']);
+        $this->assertCount(1, $templatesByGroup['group2']);
+    }
+
+    public function testGetGroup(): void
+    {
+        $this->configStorage->create();
+        $this->filesystem->mkdir($this->testDir . '/.phpscff/templates/group1');
+
+        $group = $this->configStorage->getGroup('group1');
+        $this->assertInstanceOf(\Hytmng\PhpScff\Group::class, $group);
+    }
+
+    public function testHasTemplate_WithGroup(): void
+    {
+        $this->configStorage->create();
+        $this->filesystem->mkdir($this->testDir . '/.phpscff/templates/group1');
+
+        $templateFile = File::fromStringPath($this->testDir . '/test_template.txt');
+        $templateFile->write('test content');
+        $template = Template::fromFile($templateFile);
+
+        $this->assertFalse($this->configStorage->hasTemplate('test_template.txt', 'group1'));
+        $this->configStorage->addTemplate($template, 'group1');
+        $this->assertTrue($this->configStorage->hasTemplate('test_template.txt', 'group1'));
+    }
+
+    public function testHasTemplate_WithTemplateObject(): void
+    {
+        $this->configStorage->create();
+        $templateFile = File::fromStringPath($this->testDir . '/test_template.txt');
+        $templateFile->write('test content');
+        $template = Template::fromFile($templateFile);
+
+        $this->assertFalse($this->configStorage->hasTemplate($template));
+        $this->configStorage->addTemplate($template);
+        $this->assertTrue($this->configStorage->hasTemplate($template));
+    }
+
+    public function testHasTemplate_ThrowException(): void
+    {
+        $this->expectException(ExistenceException::class);
+        $this->configStorage->hasTemplate('test_template.txt');
+    }
 }
