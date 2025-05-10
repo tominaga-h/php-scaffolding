@@ -33,14 +33,15 @@ class GroupTreeCommand extends Command
 		$configStorage = $app->getConfigStorage();
 		$group = $input->getArgument('group');
 
-		// if (!$configStorage->hasGroup($group)) {
-		// 	throw new InvalidArgumentException('Group ' . Msg::quote($group) . ' not found.');
-		// }
+		if (!$configStorage->hasGroup($group)) {
+			throw new InvalidArgumentException('Group ' . Msg::quote($group) . ' is not exists.');
+		}
 
-		// TODO: グループフォルダ内の `meta.yaml` を読み込む
-		$yamlFilePath = Path::from(__DIR__, '/../../../config/test.yaml');
+		$group = $configStorage->getGroup($group);
+		$metaYamlPath = $group->getMetaYamlPath();
+
 		$yamlParser = new YamlParser();
-		$yaml = $yamlParser->parseFile($yamlFilePath->get());
+		$yaml = $yamlParser->parseFile($metaYamlPath->get());
 		$structure = $yaml['structure'];
 
 		$rootEntry = StructureParser::parse($structure, 'root');
