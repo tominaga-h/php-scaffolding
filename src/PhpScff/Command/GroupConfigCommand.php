@@ -6,10 +6,9 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Yaml\Parser as YamlParser;
 use Hytmng\PhpScff\Application;
-use Hytmng\PhpScff\FileSystem\Path;
-use Hytmng\PhpScff\Tree\StructureParser;
+use Hytmng\PhpScff\Helper\Msg;
+use Hytmng\PhpScff\Exception\ExistenceException;
 
 class GroupConfigCommand extends Command
 {
@@ -17,7 +16,7 @@ class GroupConfigCommand extends Command
 	{
 		$this
 			->setName('group:config')
-			->setDescription('Configure group by yaml file')
+			->setDescription('Configure group by editing `meta.yaml` file')
 			->addArgument('group', InputArgument::REQUIRED, 'Group name');
 	}
 
@@ -31,14 +30,12 @@ class GroupConfigCommand extends Command
 		$configStorage = $app->getConfigStorage();
 		$group = $input->getArgument('group');
 
-		$yamlFilePath = Path::from(__DIR__, '/../../../config/test.yaml');
-		$yamlParser = new YamlParser();
-		$yaml = $yamlParser->parseFile($yamlFilePath->get());
-		$structure = $yaml['structure'];
+		if (!$configStorage->hasGroup($group)) {
+			throw new ExistenceException('Group ' . Msg::quote($group) . ' is not exists.');
+		}
 
-		$rootEntry = StructureParser::parse($structure, 'root');
-		$output->writeln('ツリー構造:');
-		$output->writeln($rootEntry);
+		$group = $configStorage->getGroup($group);
+		$group->editMetaYaml();
 
 		return Command::SUCCESS;
 	}

@@ -2,20 +2,23 @@
 
 namespace Hytmng\PhpScff;
 
-use Hytmng\PhpScff\FileSystem\PathTrait;
-use Hytmng\PhpScff\FileSystem\Directory;
-use Hytmng\PhpScff\FileSystem\File;
-use Hytmng\PhpScff\Exception\ExistenceException;
 use Hytmng\PhpScff\Template;
 use Hytmng\PhpScff\Helper\Msg;
 use Hytmng\PhpScff\Helper\Filter;
 use Hytmng\PhpScff\Service\TwigService;
+use Hytmng\PhpScff\Process\EditProcess;
+use Hytmng\PhpScff\FileSystem\PathTrait;
+use Hytmng\PhpScff\FileSystem\Directory;
+use Hytmng\PhpScff\FileSystem\File;
+use Hytmng\PhpScff\FileSystem\Path;
+use Hytmng\PhpScff\Exception\ExistenceException;
 
 class Group
 {
 	use PathTrait;
 
 	private Directory $directory;
+	private ?EditProcess $editProcess = null;
 
 	public function __construct(Directory $directory)
 	{
@@ -161,14 +164,45 @@ class Group
 	}
 
 	/**
+	 * `meta.yaml` のパスを取得する
+	 *
+	 * @return Path
+	 */
+	public function getMetaYamlPath(): Path
+	{
+		return $this->path->join('meta.yaml');
+	}
+
+	/**
 	 * グループディレクトリ配下に`meta.yaml` を作成する
 	 */
 	protected function putMetaYaml(): void
 	{
-		$path = $this->path->join('meta.yaml');
+		$path = $this->getMetaYamlPath();
 		$file = File::fromPath($path);
 		$content = TwigService::renderMetaYaml($this->getGroupName());
 		$file->write($content);
+	}
+
+	/**
+	 * `meta.yaml` を編集する
+	 *
+	 * @return bool 編集が成功した場合は true, 失敗した場合は false
+	 */
+	public function editMetaYaml(): bool
+	{
+		$editor = $this->editProcess ?? new EditProcess();
+		return $editor->edit($this->getMetaYamlPath()->get());
+	}
+
+	/**
+	 * EditProcessを設定する
+	 *
+	 * @param EditProcess $editProcess
+	 */
+	public function setEditProcess(EditProcess $editProcess): void
+	{
+		$this->editProcess = $editProcess;
 	}
 
 }

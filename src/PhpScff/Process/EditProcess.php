@@ -62,7 +62,12 @@ class EditProcess
 	 */
 	public function edit(string $path): bool
 	{
-		$proc = $this->createProcess([$this->editor, $path]);
+		$command = [$this->editor];
+		if ($this->editor === 'vim') {
+			$command = array_merge($command, ['-c', 'set encoding=utf-8', '-c', 'set fileencoding=utf-8']);
+		}
+		$command[] = $path;
+		$proc = $this->createProcess($command);
 		$proc->setTty(true);
 		$proc->run();
 		return $proc->isSuccessful();

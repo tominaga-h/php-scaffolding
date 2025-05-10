@@ -19,9 +19,9 @@ class Filter
 	 */
 	public static function byFileInstance(array $files): array
 	{
-		return array_filter($files, function (FileSystemInterface $item) {
+		return array_values(array_filter($files, function (FileSystemInterface $item) {
 			return $item instanceof File;
-		});
+		}));
 	}
 
 	/**
@@ -33,8 +33,8 @@ class Filter
 	 */
 	public static function byTemplateName(array $templates, string $name): array
 	{
-		return array_filter($templates, function (Template $template) use ($name) {
+		return array_values(array_filter($templates, function (Template $template) use ($name) {
 			return $template->getFilename() === $name;
-		});
+		}));
 	}
 }
