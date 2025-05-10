@@ -93,6 +93,18 @@ class GroupTest extends TestCase
         $this->group->addTemplate($template);
     }
 
+    public function testAddTemplate_CreateGroupIfNotExists(): void
+    {
+        $file = File::fromStringPath($this->testDir . '/template.php');
+        $file->write('<?php echo "test";');
+        $template = Template::fromFile($file);
+
+        $this->assertFalse($this->group->exists());
+        $this->group->addTemplate($template);
+        $this->assertTrue($this->group->exists());
+        $this->assertTrue($this->group->hasTemplate('template.php'));
+    }
+
     public function testGetTemplates(): void
     {
         $this->group->create();
@@ -149,5 +161,23 @@ class GroupTest extends TestCase
     public function testHasTemplate_WhenGroupNotExists(): void
     {
         $this->assertFalse($this->group->hasTemplate('template.php'));
+    }
+
+    public function testHasTemplate_WithTemplateInstance(): void
+    {
+        $this->group->create();
+        $file = File::fromStringPath($this->testDir . '/template.php');
+        $file->write('<?php echo "test";');
+        $template = Template::fromFile($file);
+
+        $this->group->addTemplate($template);
+        $this->assertTrue($this->group->hasTemplate($template));
+        $this->assertFalse($this->group->hasTemplate(Template::fromFile(File::fromStringPath($this->testDir . '/non-existent.php'))));
+    }
+
+    public function testGetTemplate_ThrowException_WhenGroupNotExists(): void
+    {
+        $this->expectException(ExistenceException::class);
+        $this->group->getTemplate('template.php');
     }
 }
