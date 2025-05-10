@@ -11,12 +11,13 @@ use Hytmng\PhpScff\Application;
 use Hytmng\PhpScff\Exception\ExistenceException;
 use Hytmng\PhpScff\Config\ConfigStorage;
 use Hytmng\PhpScff\Helper\Msg;
-class EditCommand extends Command
+
+class TemplateEditCommand extends Command
 {
     protected function configure(): void
     {
         $this
-            ->setName('edit')
+            ->setName('template:edit')
             ->setDescription('Edit template for defining parameter')
             ->addArgument('template', InputArgument::REQUIRED, 'The template name to edit')
             ->addOption('group', 'g', InputOption::VALUE_REQUIRED, 'Group name', ConfigStorage::DEFAULT_GROUP)

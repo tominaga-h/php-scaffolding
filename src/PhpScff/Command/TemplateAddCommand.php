@@ -15,12 +15,12 @@ use Hytmng\PhpScff\Exception\ExistenceException;
 use Hytmng\PhpScff\Config\ConfigStorage;
 use Hytmng\PhpScff\Helper\Msg;
 
-class AddCommand extends Command
+class TemplateAddCommand extends Command
 {
 	protected function configure(): void
 	{
 		$this
-			->setName('add')
+			->setName('template:add')
 			->setDescription('Add a file as template')
 			->addArgument('file', InputArgument::REQUIRED, 'The file path to add')
 			->addOption('group', 'g', InputOption::VALUE_REQUIRED, 'Group name', ConfigStorage::DEFAULT_GROUP);
