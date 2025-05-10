@@ -38,7 +38,7 @@ class TemplateEditCommand extends Command
         // テンプレートが存在しない場合はエラー
         if (!$configStorage->hasTemplate($templateName, $group)) {
             $msg = Msg::makeTemplateMsg(Msg::FLG_NOT_FOUND, $templateName, $group);
-            $msg .= "\nYou can check templates using `list --all` command.";
+            $msg .= "\nYou can check templates using `group:list -f` command.";
             throw new ExistenceException($msg);
         }
 
