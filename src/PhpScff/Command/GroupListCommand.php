@@ -13,14 +13,14 @@ use Hytmng\PhpScff\Config\ConfigStorage;
 /**
  * List existing group folders.
  */
-class GroupsCommand extends Command
+class GroupListCommand extends Command
 {
 	protected function configure(): void
 	{
 		$this
-			->setName('groups')
+			->setName('group:list')
 			->setDescription('List all existing groups')
-			->addOption('with-templates', 't', InputOption::VALUE_NONE, 'List groups with templates');
+			->addOption('files', 'f', InputOption::VALUE_NONE, 'List groups with files in each group directory');
 	}
 
 	protected function execute(InputInterface $input, OutputInterface $output): int
@@ -30,9 +30,9 @@ class GroupsCommand extends Command
 			return Command::FAILURE;
 		}
 		$configStorage = $app->getConfigStorage();
-		$WithTemplates = $input->getOption('with-templates');
+		$WithFiles = $input->getOption('files');
 
-		if ($WithTemplates) {
+		if ($WithFiles) {
 			$groups = $configStorage->getTemplatesByGroup();
 			$this->outputGroups($output, $groups, true);
 		} else {
