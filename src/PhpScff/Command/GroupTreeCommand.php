@@ -2,22 +2,24 @@
 
 namespace Hytmng\PhpScff\Command;
 
+use InvalidArgumentException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Yaml\Parser as YamlParser;
 use Hytmng\PhpScff\Application;
-use Hytmng\PhpScff\FileSystem\Path;
 use Hytmng\PhpScff\Tree\StructureParser;
+use Hytmng\PhpScff\FileSystem\Path;
+use Hytmng\PhpScff\Helper\Msg;
 
-class GroupConfigCommand extends Command
+class GroupTreeCommand extends Command
 {
 	protected function configure(): void
 	{
 		$this
-			->setName('group:config')
-			->setDescription('Configure group by yaml file')
+			->setName('group:tree')
+			->setDescription('Render group tree structure like the `tree` command')
 			->addArgument('group', InputArgument::REQUIRED, 'Group name');
 	}
 
@@ -31,13 +33,17 @@ class GroupConfigCommand extends Command
 		$configStorage = $app->getConfigStorage();
 		$group = $input->getArgument('group');
 
+		// if (!$configStorage->hasGroup($group)) {
+		// 	throw new InvalidArgumentException('Group ' . Msg::quote($group) . ' not found.');
+		// }
+
+		// TODO: グループフォルダ内の `meta.yaml` を読み込む
 		$yamlFilePath = Path::from(__DIR__, '/../../../config/test.yaml');
 		$yamlParser = new YamlParser();
 		$yaml = $yamlParser->parseFile($yamlFilePath->get());
 		$structure = $yaml['structure'];
 
 		$rootEntry = StructureParser::parse($structure, 'root');
-		$output->writeln('ツリー構造:');
 		$output->writeln($rootEntry);
 
 		return Command::SUCCESS;
