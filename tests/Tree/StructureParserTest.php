@@ -112,7 +112,7 @@ class StructureParserTest extends TestCase
         $this->assertEquals('file3.txt', (string)$subdir2Nodes[0]);
     }
 
-    public function testParse_ThrowException(): void
+    public function testParse_ThrowException_InvalidItem(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid item format in structure');
@@ -123,6 +123,15 @@ class StructureParserTest extends TestCase
             ]
         ];
 
+        StructureParser::parse($structure, 'test-dir');
+    }
+
+    public function testParse_ThrowException_UndefinedStructure(): void
+    {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage("Directory structure is not defined.\nPlease edit that by `group:config` command.");
+
+        $structure = ['root' => null];
         StructureParser::parse($structure, 'test-dir');
     }
 }
