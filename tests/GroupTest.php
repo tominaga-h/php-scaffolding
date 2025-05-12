@@ -9,6 +9,8 @@ use Hytmng\PhpScff\FileSystem\Path;
 use Hytmng\PhpScff\Template;
 use Hytmng\PhpScff\Group;
 use Hytmng\PhpScff\Exception\ExistenceException;
+use Hytmng\PhpScff\Process\EditProcess;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Filesystem\Filesystem;
 
 class GroupTest extends TestCase
@@ -16,6 +18,7 @@ class GroupTest extends TestCase
     private string $testDir;
     private Filesystem $filesystem;
     private Group $group;
+    private EditProcess&MockObject $editProcess;
 
     protected function setUp(): void
     {
@@ -23,8 +26,15 @@ class GroupTest extends TestCase
         $this->filesystem = new Filesystem();
         $this->filesystem->mkdir($this->testDir);
 
+        // EditProcessのモックを作成
+		$this->editProcess = $this->getMockBuilder(EditProcess::class)
+        ->disableOriginalConstructor()
+        ->getMock();
+
+        // Groupオブジェクトを作成
         $directory = new Directory(Path::from($this->testDir, 'test-group'), $this->filesystem);
         $this->group = new Group($directory);
+        $this->group->setEditProcess($this->editProcess);
     }
 
     protected function tearDown(): void
@@ -180,4 +190,29 @@ class GroupTest extends TestCase
         $this->expectException(ExistenceException::class);
         $this->group->getTemplate('template.php');
     }
+
+    public function testGetMetaYamlPath(): void
+    {
+        $actual = $this->group->getMetaYamlPath();
+        $expected = Path::from($this->testDir, 'test-group', 'meta.yaml');
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testEditMetaYaml(): void
+    {
+        $this->group->create();
+
+		// EditProcessのモックの振る舞いを設定
+		$this->editProcess->expects($this->once())
+			->method('edit')
+			->with($this->group->getMetaYamlPath()->get())
+			->willReturn(true);
+
+		// 編集メソッドを実行
+		$result = $this->group->editMetaYaml();
+
+		// 編集結果の検証
+		$this->assertTrue($result);
+    }
+
 }
