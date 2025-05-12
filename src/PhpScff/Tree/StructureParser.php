@@ -21,7 +21,7 @@ class StructureParser
 		if (\is_null($structure['root'])) {
 			$msg = "Directory structure is not defined.\n";
 			$msg .= "Please edit that by `group:config` command.";
-			throw new \InvalidArgumentException($msg);
+			throw new \RuntimeException($msg);
 		}
 
 		// ツリー構造のルートを設定
