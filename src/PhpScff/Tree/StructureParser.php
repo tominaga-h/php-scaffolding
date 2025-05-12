@@ -18,12 +18,11 @@ class StructureParser
 	 */
 	public static function parse(array $structure, string $rootDir): TreeEntry
 	{
-		/**
-		 * Structure の構造
-		 * 文字列: ファイル名
-		 * 配列: キーをディレクトリ名とし、配列または文字列を含む
-		 * $structureのキーはかならず `root` になるが、ルートディレクトリ名は `rootDir` を指定する
-		 */
+		if (\is_null($structure['root'])) {
+			$msg = "Directory structure is not defined.\n";
+			$msg .= "Please edit that by `group:config` command.";
+			throw new \InvalidArgumentException($msg);
+		}
 
 		// ツリー構造のルートを設定
 		$rootPath = new Path($rootDir);
