@@ -1,7 +1,27 @@
 {
     "name": "hytmng/php-scaffolding",
     "description": "PHPで実装したスカフォールディングツール",
+    "type": "project",
     "license": "MIT",
+    "keywords": [
+        "scaffolding",
+        "template",
+        "generator",
+        "cli",
+        "boilerplate",
+        "project-template"
+    ],
+    "homepage": "https://github.com/tominaga-h/php-scaffolding",
+    "support": {
+        "issues": "https://github.com/tominaga-h/php-scaffolding/issues",
+        "source": "https://github.com/tominaga-h/php-scaffolding"
+    },
+    "authors": [
+        {
+            "name": "Tominaga Hayato"
+        }
+    ],
+    "bin": ["bin/phscff"],
     "autoload": {
         "psr-4": {
             "Hytmng\\PhpScff\\": "src/PhpScff/"
@@ -12,22 +32,18 @@
             "Tests\\": "tests/"
         }
     },
-    "authors": [
-        {
-            "name": "Tominaga Hayato"
-        }
-    ],
-    "require-dev": {
-        "phpunit/phpunit": "^12.0",
-        "php-coveralls/php-coveralls": "^2.7",
-        "mikey179/vfsstream": "^1.6"
-    },
     "require": {
+        "php": ">=8.3",
         "symfony/console": "^7.2",
         "symfony/filesystem": "^7.2",
         "symfony/process": "^7.2",
         "symfony/dependency-injection": "^7.2",
         "twig/twig": "^3.21"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^12.0",
+        "php-coveralls/php-coveralls": "^2.7",
+        "mikey179/vfsstream": "^1.6"
     },
     "scripts": {
         "test": "./vendor/bin/phpunit",
