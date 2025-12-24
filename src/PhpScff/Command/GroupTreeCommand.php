@@ -7,11 +7,10 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Yaml\Parser as YamlParser;
 use Hytmng\PhpScff\Application;
 use Hytmng\PhpScff\Tree\StructureParser;
-use Hytmng\PhpScff\FileSystem\Path;
 use Hytmng\PhpScff\Helper\Msg;
+use Hytmng\PhpScff\Helper\YamlParser;
 
 class GroupTreeCommand extends Command
 {
@@ -40,8 +39,7 @@ class GroupTreeCommand extends Command
 		$group = $configStorage->getGroup($group);
 		$metaYamlPath = $group->getMetaYamlPath();
 
-		$yamlParser = new YamlParser();
-		$yaml = $yamlParser->parseFile($metaYamlPath->get());
+		$yaml = YamlParser::parseFile($metaYamlPath->get());
 		$structure = $yaml['structure'];
 
 		$rootEntry = StructureParser::parse($structure, 'root');
