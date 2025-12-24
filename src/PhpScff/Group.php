@@ -120,9 +120,9 @@ class Group
 			return $file->getFilename() !== 'meta.yaml';
 		});
 
-		return array_map(function (File $item) {
+		return array_values(array_map(function (File $item) {
 			return Template::fromFile($item);
-		}, $filtered);
+		}, $filtered));
 	}
 
 	/**
