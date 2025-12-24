@@ -39,6 +39,16 @@ class TreeEntry
 		$this->directory->create();
 	}
 
+	public function remove(): void
+	{
+		$this->directory->remove();
+	}
+
+	public function getDirName(): string
+	{
+		return $this->directory->getDirName();
+	}
+
 	/**
 	 * ノードを追加する
 	 *

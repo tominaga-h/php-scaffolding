@@ -34,8 +34,13 @@ class TreeNode
 		$this->file->write($content);
 	}
 
-	public function __toString(): string
+	public function getFilename(): string
 	{
 		return $this->file->getFilename();
+	}
+
+	public function __toString(): string
+	{
+		return $this->getFilename();
 	}
 }

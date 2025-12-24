@@ -11,6 +11,11 @@ class Msg
 	public const FLG_ADDED = 1;
 	public const FLG_ALREADY_EXISTS = 2;
 
+	public const LOG_CREATED = 1;
+	public const LOG_DELETED = 2;
+	public const LOG_FAILED = 3;
+	public const LOG_ERROR = 4;
+
 	public const SPACE = ' ';
 	public const QUOTE = '"';
 	public const PERIOD = '.';
@@ -68,6 +73,49 @@ class Msg
 			default:
 				return '';
 		}
+	}
+
+	/**
+	 * ログのプレフィックスを作成する
+	 *
+	 * @param int $logType ログの種類
+	 * @param string $msg ログのメッセージ
+	 * @return string
+	 */
+	public static function makeLogPrefix(int $logType, string $msg)
+	{
+		/** @var string|null $color */
+		$color = null;
+		/** @var string|null $prefix */
+		$prefix = null;
+		/** @var int $margin */
+		$margin = 0;
+
+		switch ($logType) {
+			case self::LOG_CREATED:
+				$color = 'blue';
+				$prefix = 'CREATED';
+				$margin = 0;
+				break;
+			case self::LOG_DELETED:
+				$color = 'red';
+				$prefix = 'DELETED';
+				$margin = 0;
+				break;
+			case self::LOG_FAILED:
+				$color = 'red';
+				$prefix = 'FAILED';
+				$margin = 1;
+				break;
+			case self::LOG_ERROR:
+				$color = 'red';
+				$prefix = 'ERROR';
+				$margin = 2;
+				break;
+		}
+
+		return '[' . self::style($prefix, $color, ['bold']) . str_repeat(self::SPACE, $margin) . '] ' . $msg;
+
 	}
 
 	public static function style(string $msg, ?string $color = null, array $options = []): string

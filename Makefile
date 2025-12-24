@@ -1,4 +1,4 @@
-CONTAINER_NAME := php-scaffolding_php_1
+CONTAINER_NAME := php-scaffolding-php-1
 
 up:
 	docker-compose up -d
