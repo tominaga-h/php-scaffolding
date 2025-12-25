@@ -191,8 +191,65 @@ class Group
 	 */
 	public function editMetaYaml(): bool
 	{
+		$path = $this->getMetaYamlPath();
+		$file = File::fromPath($path);
+
+		// meta.yamlの内容を読み取り、テンプレート一覧を挿入
+		$content = $file->read();
+		$content = $this->insertTemplateList($content);
+		$file->write($content, true);
+
 		$editor = $this->editProcess ?? new EditProcess();
-		return $editor->edit($this->getMetaYamlPath()->get());
+		return $editor->edit($path->get());
+	}
+
+	/**
+	 * meta.yamlの内容にテンプレート一覧を挿入する
+	 *
+	 * @param string $content meta.yamlの内容
+	 * @return string テンプレート一覧が挿入されたmeta.yamlの内容
+	 */
+	private function insertTemplateList(string $content): string
+	{
+		$templates = $this->getTemplates();
+		$templateList = $this->formatTemplateList($templates);
+
+		// 既存のテンプレート一覧コメントのパターン
+		// "(なし)" または "#   - filename" の行のみをマッチ
+		$pattern = '/# 登録済みテンプレート:(?:\s*\(なし\)|(?:\n#   - [^\n]+)*)/u';
+
+		if (preg_match($pattern, $content)) {
+			// 既存のテンプレート一覧を更新
+			return preg_replace($pattern, $templateList, $content);
+		}
+
+		// 旧形式のヒントコメントを置換
+		$oldHint = '# グループに所属するテンプレートは `group:list -f` コマンドで確認できます。';
+		if (str_contains($content, $oldHint)) {
+			return str_replace($oldHint, $templateList, $content);
+		}
+
+		return $content;
+	}
+
+	/**
+	 * テンプレート一覧をYAMLコメント形式でフォーマットする
+	 *
+	 * @param Template[] $templates テンプレートの配列
+	 * @return string フォーマットされたテンプレート一覧
+	 */
+	private function formatTemplateList(array $templates): string
+	{
+		if (empty($templates)) {
+			return '# 登録済みテンプレート: (なし)';
+		}
+
+		$lines = ['# 登録済みテンプレート:'];
+		foreach ($templates as $template) {
+			$lines[] = '#   - ' . $template->getFilename();
+		}
+
+		return implode("\n", $lines);
 	}
 
 	/**

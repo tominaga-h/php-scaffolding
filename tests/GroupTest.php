@@ -215,4 +215,92 @@ class GroupTest extends TestCase
 		$this->assertTrue($result);
     }
 
+    public function testEditMetaYaml_InsertTemplateList_WhenNoTemplates(): void
+    {
+        $this->group->create();
+
+        // EditProcessのモックの振る舞いを設定
+        $this->editProcess->expects($this->once())
+            ->method('edit')
+            ->willReturn(true);
+
+        // 編集メソッドを実行
+        $this->group->editMetaYaml();
+
+        // meta.yamlの内容を確認
+        $metaYamlPath = $this->group->getMetaYamlPath()->get();
+        $content = file_get_contents($metaYamlPath);
+
+        // テンプレートがない場合の表示を確認
+        $this->assertStringContainsString('# 登録済みテンプレート: (なし)', $content);
+    }
+
+    public function testEditMetaYaml_InsertTemplateList_WithTemplates(): void
+    {
+        $this->group->create();
+
+        // テンプレートを追加
+        $file1 = File::fromStringPath($this->testDir . '/Dockerfile');
+        $file1->write('FROM php:8.1');
+        $template1 = Template::fromFile($file1);
+        $this->group->addTemplate($template1);
+
+        $file2 = File::fromStringPath($this->testDir . '/docker-compose.yml');
+        $file2->write('version: "3"');
+        $template2 = Template::fromFile($file2);
+        $this->group->addTemplate($template2);
+
+        // EditProcessのモックの振る舞いを設定
+        $this->editProcess->expects($this->once())
+            ->method('edit')
+            ->willReturn(true);
+
+        // 編集メソッドを実行
+        $this->group->editMetaYaml();
+
+        // meta.yamlの内容を確認
+        $metaYamlPath = $this->group->getMetaYamlPath()->get();
+        $content = file_get_contents($metaYamlPath);
+
+        // テンプレート一覧の表示を確認
+        $this->assertStringContainsString('# 登録済みテンプレート:', $content);
+        $this->assertStringContainsString('#   - Dockerfile', $content);
+        $this->assertStringContainsString('#   - docker-compose.yml', $content);
+
+        // structure: が保持されていることを確認
+        $this->assertStringContainsString('structure:', $content);
+        $this->assertStringContainsString('root:', $content);
+    }
+
+    public function testEditMetaYaml_UpdateTemplateList_OnSubsequentEdits(): void
+    {
+        $this->group->create();
+
+        // EditProcessのモックを複数回呼び出せるように設定
+        $this->editProcess->expects($this->exactly(2))
+            ->method('edit')
+            ->willReturn(true);
+
+        // 最初の編集（テンプレートなし）
+        $this->group->editMetaYaml();
+
+        // テンプレートを追加
+        $file = File::fromStringPath($this->testDir . '/App.php');
+        $file->write('<?php class App {}');
+        $template = Template::fromFile($file);
+        $this->group->addTemplate($template);
+
+        // 2回目の編集（テンプレートあり）
+        $this->group->editMetaYaml();
+
+        // meta.yamlの内容を確認
+        $metaYamlPath = $this->group->getMetaYamlPath()->get();
+        $content = file_get_contents($metaYamlPath);
+
+        // テンプレート一覧が更新されていることを確認
+        $this->assertStringContainsString('# 登録済みテンプレート:', $content);
+        $this->assertStringContainsString('#   - App.php', $content);
+        $this->assertStringNotContainsString('(なし)', $content);
+    }
+
 }
