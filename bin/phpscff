@@ -7,7 +7,11 @@ use Hytmng\PhpScff\Application;
 use Hytmng\PhpScff\Config\ConfigStorage;
 use Hytmng\PhpScff\Kernel;
 
-$app = new Application('phscff', 'v0.1.0a');
+// composer.json からバージョンを取得
+$composer = json_decode(file_get_contents(__DIR__ . '/../composer.json'), true);
+$version = $composer['version'] ?? '1.0.0';
+
+$app = new Application('phscff', $version);
 $configStorage = new ConfigStorage($_SERVER['HOME']);
 
 $kernel = new Kernel();
