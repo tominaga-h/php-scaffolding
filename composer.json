@@ -1,6 +1,7 @@
 {
     "name": "hytmng/php-scaffolding",
     "description": "PHPで実装したスカフォールディングツール",
+    "version": "1.1.0",
     "type": "project",
     "license": "MIT",
     "keywords": [

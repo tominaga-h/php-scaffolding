@@ -20,7 +20,7 @@ export PATH="$HOME/.composer/vendor/bin:$PATH"
 ### 使用方法
 
 ```bash
-phscff new my-project
+phspcff new my-project
 ```
 
 ## 機能
@@ -88,3 +88,7 @@ structure:
 
 - `.phpscff/templates` テンプレート保存場所
 - `.phpscff/groups` グループ設定 yaml 保存場所
+
+## CHANGELOG
+
+[CHANGELOG.md](./CHANGELOG.md) を参照
