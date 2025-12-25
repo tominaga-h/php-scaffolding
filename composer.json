@@ -22,7 +22,7 @@
             "name": "Tominaga Hayato"
         }
     ],
-    "bin": ["bin/phscff"],
+    "bin": ["bin/phpscff"],
     "autoload": {
         "psr-4": {
             "Hytmng\\PhpScff\\": "src/PhpScff/"
